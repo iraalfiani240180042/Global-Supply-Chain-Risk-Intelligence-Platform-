@@ -1,23 +1,95 @@
-<div class="sidebar">
+<aside class="sidebar">
 
-    <h2>🌍 GSC</h2>
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="bi bi-globe-central-south-asia"></i>
+        </div>
 
-    <ul>
+        <div class="brand">
+            <h5>GSC-RIP</h5>
+            <small>Risk Intelligence</small>
+        </div>
+    </div>
 
-        <li><a href="/dashboard">Dashboard</a></li>
+    <ul class="menu">
 
-        <li><a href="/countries">Country</a></li>
+        <li>
+            <a href="{{ route('dashboard') }}" class="active">
+                <i class="bi bi-grid-fill"></i>
+                Dashboard
+            </a>
+        </li>
 
-        <li><a href="/weather">Weather</a></li>
+        <li>
+            <a href="{{ route('countries') }}">
+                <i class="bi bi-globe2"></i>
+                Countries
+            </a>
+        </li>
 
-        <li><a href="/currency">Currency</a></li>
+        <li>
+            <a href="{{ route('weather') }}">
+                <i class="bi bi-cloud-sun"></i>
+                Weather
+            </a>
+        </li>
 
-        <li><a href="/news">News</a></li>
+        <li>
+            <a href="{{ route('currency') }}">
+                <i class="bi bi-currency-exchange"></i>
+                Currency
+            </a>
+        </li>
 
-        <li><a href="/ports">Ports</a></li>
+        <li>
+            <a href="{{ route('news') }}">
+                <i class="bi bi-newspaper"></i>
+                News
+            </a>
+        </li>
 
-        <li><a href="/analytics">Analytics</a></li>
+        <li>
+            <a href="{{ route('ports') }}">
+                <i class="bi bi-truck"></i>
+                Ports
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ route('analytics') }}">
+                <i class="bi bi-graph-up-arrow"></i>
+                Analytics
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ route('comparison') }}">
+                <i class="bi bi-bar-chart-line"></i>
+                Comparison
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ route('profile') }}">
+                <i class="bi bi-person-circle"></i>
+                Profile
+            </a>
+        </li>
 
     </ul>
 
-</div>
+    <form method="POST" action="{{ route('logout') }}">
+
+        @csrf
+
+        <button class="logout-btn">
+
+            <i class="bi bi-box-arrow-left"></i>
+
+            Logout
+
+        </button>
+
+    </form>
+
+</aside>

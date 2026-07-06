@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WeatherController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -17,7 +19,8 @@ Route::controller(LoginController::class)->group(function () {
 // Protected Routes
 Route::middleware('auth')->group(function () {
 
-    Route::view('/dashboard', 'dashboard.index')->name('dashboard');
+   Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
 
     Route::view('/countries', 'countries.index')->name('countries');
 
@@ -34,4 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::view('/comparison', 'comparison.index')->name('comparison');
 
     Route::view('/profile', 'profile.index')->name('profile');
+
+    // API Weather
+    Route::get('/weather-data', [WeatherController::class, 'index'])
+        ->name('weather.data');
 });
