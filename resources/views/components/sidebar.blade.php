@@ -14,64 +14,64 @@
     <ul class="menu">
 
         <li>
-            <a href="{{ route('dashboard') }}" class="active">
-                <i class="bi bi-grid-fill"></i>
+          <a href="{{ route('dashboard') }}"
+   class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 Dashboard
             </a>
         </li>
 
         <li>
-            <a href="{{ route('countries') }}">
-                <i class="bi bi-globe2"></i>
+       <a href="{{ route('countries.index') }}"
+   class="{{ request()->routeIs('countries.*') ? 'active' : '' }}">
                 Countries
             </a>
         </li>
 
         <li>
-            <a href="{{ route('weather') }}">
-                <i class="bi bi-cloud-sun"></i>
+           <a href="{{ route('weather') }}"
+   class="{{ request()->routeIs('weather') ? 'active' : '' }}">
                 Weather
             </a>
         </li>
 
         <li>
-            <a href="{{ route('currency') }}">
-                <i class="bi bi-currency-exchange"></i>
+           <a href="{{ route('currency') }}"
+   class="{{ request()->routeIs('currency') ? 'active' : '' }}">
                 Currency
             </a>
         </li>
 
         <li>
-            <a href="{{ route('news') }}">
-                <i class="bi bi-newspaper"></i>
+           <a href="{{ route('news') }}"
+   class="{{ request()->routeIs('news') ? 'active' : '' }}">
                 News
             </a>
         </li>
 
         <li>
-            <a href="{{ route('ports') }}">
-                <i class="bi bi-truck"></i>
+            <a href="{{ route('ports') }}"
+   class="{{ request()->routeIs('ports') ? 'active' : '' }}">
                 Ports
             </a>
         </li>
 
         <li>
-            <a href="{{ route('analytics') }}">
-                <i class="bi bi-graph-up-arrow"></i>
+            <a href="{{ route('analytics') }}"
+   class="{{ request()->routeIs('analytics') ? 'active' : '' }}">
                 Analytics
             </a>
         </li>
 
         <li>
-            <a href="{{ route('comparison') }}">
-                <i class="bi bi-bar-chart-line"></i>
+            <a href="{{ route('comparison') }}"
+   class="{{ request()->routeIs('comparison') ? 'active' : '' }}">
                 Comparison
             </a>
         </li>
 
         <li>
-            <a href="{{ route('profile') }}">
-                <i class="bi bi-person-circle"></i>
+            <a href="{{ route('profile') }}"
+   class="{{ request()->routeIs('profile') ? 'active' : '' }}">
                 Profile
             </a>
         </li>

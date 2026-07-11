@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\WeatherController;
+use App\Http\Controllers\CountryController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,26 +20,37 @@ Route::controller(LoginController::class)->group(function () {
 // Protected Routes
 Route::middleware('auth')->group(function () {
 
-   Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-    Route::view('/countries', 'countries.index')->name('countries');
+    // Countries
+    Route::get('/countries/sync', [CountryController::class, 'sync'])
+        ->name('countries.sync');
 
+    Route::resource('countries', CountryController::class);
+
+    // Weather
     Route::view('/weather', 'weather.index')->name('weather');
 
-    Route::view('/currency', 'currency.index')->name('currency');
-
-    Route::view('/news', 'news.index')->name('news');
-
-    Route::view('/ports', 'ports.index')->name('ports');
-
-    Route::view('/analytics', 'analytics.index')->name('analytics');
-
-    Route::view('/comparison', 'comparison.index')->name('comparison');
-
-    Route::view('/profile', 'profile.index')->name('profile');
-
-    // API Weather
     Route::get('/weather-data', [WeatherController::class, 'index'])
         ->name('weather.data');
+
+    // Currency
+    Route::view('/currency', 'currency.index')->name('currency');
+
+    // News
+    Route::view('/news', 'news.index')->name('news');
+
+    // Ports
+    Route::view('/ports', 'ports.index')->name('ports');
+
+    // Analytics
+    Route::view('/analytics', 'analytics.index')->name('analytics');
+
+    // Comparison
+    Route::view('/comparison', 'comparison.index')->name('comparison');
+
+    // Profile
+    Route::view('/profile', 'profile.index')->name('profile');
 });

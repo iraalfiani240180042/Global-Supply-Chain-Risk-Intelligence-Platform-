@@ -8,14 +8,28 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Ambil data cuaca Jakarta
-        $response = Http::get('https://api.open-meteo.com/v1/forecast', [
-            'latitude' => -6.2088,
-            'longitude' => 106.8456,
-            'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m'
-        ]);
+        try {
 
-        $weather = $response->json();
+            $response = Http::timeout(30)
+                ->retry(3, 1000)
+                ->get('https://api.open-meteo.com/v1/forecast', [
+                    'latitude' => -6.2088,
+                    'longitude' => 106.8456,
+                    'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m'
+                ]);
+
+            $weather = $response->json();
+
+        } catch (\Exception $e) {
+
+            $weather = [
+                'current' => [
+                    'temperature_2m' => '-',
+                    'relative_humidity_2m' => '-',
+                    'wind_speed_10m' => '-'
+                ]
+            ];
+        }
 
         return view('dashboard.index', compact('weather'));
     }
