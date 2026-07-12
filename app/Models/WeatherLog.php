@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WeatherLog extends Model
 {
@@ -20,12 +19,12 @@ class WeatherLog extends Model
         'recorded_at' => 'datetime'
     ];
 
-    public function country(): BelongsTo
+    public function country()
     {
         return $this->belongsTo(Country::class);
     }
 
-    public function weatherType(): BelongsTo
+    public function weatherType()
     {
         return $this->belongsTo(WeatherType::class);
     }

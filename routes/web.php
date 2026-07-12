@@ -31,10 +31,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('countries', CountryController::class);
 
     // Weather
-    Route::view('/weather', 'weather.index')->name('weather');
+    Route::get('/weather', [WeatherController::class, 'index'])
+        ->name('weather');
 
-    Route::get('/weather-data', [WeatherController::class, 'index'])
-        ->name('weather.data');
+    Route::get('/weather/sync', [WeatherController::class, 'sync'])
+        ->name('weather.sync');
 
     // Currency
     Route::view('/currency', 'currency.index')->name('currency');
