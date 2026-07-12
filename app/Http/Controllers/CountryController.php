@@ -59,43 +59,46 @@ class CountryController extends Controller
      */
     public function sync()
     {
-        $response = Http::timeout(60)->get('https://restcountries.com/v3.1/all');
+        $response = Http::timeout(60)
+            ->withToken(env('RESTCOUNTRIES_API_KEY'))
+            ->get('https://api.restcountries.com/countries/v5', [
+                'limit' => 100
+            ]);
 
         if (!$response->successful()) {
-            return back()->with('error', 'Failed to fetch countries.');
+            return redirect()
+                ->route('countries.index')
+                ->with('error', 'Failed to fetch countries.');
         }
 
-       dd($response->status(), $response->body());
+        $countries = $response->json('data.objects');
 
         foreach ($countries as $item) {
 
             $regionName = $item['region'] ?? 'Other';
 
-           $region = Region::firstOrCreate(
-    [
-        'name' => $regionName
-    ],
-    [
-        'code' => strtoupper(substr($regionName, 0, 3))
-    ]
-);
+            $region = Region::firstOrCreate(
+                [
+                    'name' => $regionName
+                ],
+                [
+                    'code' => strtoupper(substr($regionName, 0, 3))
+                ]
+            );
 
             Country::updateOrCreate(
-
                 [
-                    'iso_code' => $item['cca2'] ?? ''
+                    'iso_code' => $item['codes']['alpha_2'] ?? ''
                 ],
-
                 [
                     'region_id'  => $region->id,
-                    'name'       => $item['name']['common'] ?? '',
-                    'capital'    => $item['capital'][0] ?? '-',
+                    'name'       => $item['names']['common'] ?? '',
+                    'capital'    => $item['capitals'][0]['name'] ?? '-',
                     'population' => $item['population'] ?? 0,
-                    'latitude'   => $item['latlng'][0] ?? null,
-                    'longitude'  => $item['latlng'][1] ?? null,
-                    'flag'       => $item['flags']['png'] ?? null,
+                    'latitude'   => $item['coordinates']['lat'] ?? null,
+                    'longitude'  => $item['coordinates']['lng'] ?? null,
+                    'flag'       => $item['flag']['url_png'] ?? null,
                 ]
-
             );
         }
 
