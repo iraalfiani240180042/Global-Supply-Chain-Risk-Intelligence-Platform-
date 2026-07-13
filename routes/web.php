@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -41,7 +42,11 @@ Route::middleware('auth')->group(function () {
     Route::view('/currency', 'currency.index')->name('currency');
 
     // News
-    Route::view('/news', 'news.index')->name('news');
+    Route::get('/news', [NewsController::class, 'index'])
+    ->name('news');
+
+Route::get('/news/sync', [NewsController::class, 'sync'])
+    ->name('news.sync');
 
     // Ports
     Route::view('/ports', 'ports.index')->name('ports');
