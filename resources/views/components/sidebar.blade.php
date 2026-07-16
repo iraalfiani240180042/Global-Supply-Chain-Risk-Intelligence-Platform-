@@ -49,10 +49,10 @@
         </li>
 
         <li>
-            <a href="{{ route('ports') }}"
-   class="{{ request()->routeIs('ports') ? 'active' : '' }}">
-                Ports
-            </a>
+            <a href="{{ route('ports.index') }}"
+   class="{{ request()->routeIs('ports.*') ? 'active' : '' }}">
+    Ports
+</a>
         </li>
 
         <li>

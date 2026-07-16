@@ -16,7 +16,11 @@ class Country extends Model
         'population',
         'latitude',
         'longitude',
-        'flag'
+        'flag',
+
+        // Currency
+        'currency_name',
+        'currency_code',
     ];
 
     public function region(): BelongsTo

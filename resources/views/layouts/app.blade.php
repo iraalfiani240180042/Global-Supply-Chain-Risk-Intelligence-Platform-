@@ -31,5 +31,8 @@
 
 </div>
 
+{{-- Semua script dari @push('scripts') akan tampil di sini --}}
+@stack('scripts')
+
 </body>
 </html>
