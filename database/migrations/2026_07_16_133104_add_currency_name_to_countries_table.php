@@ -9,16 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('countries', function (Blueprint $table) {
-            $table->string('currency_symbol', 20)
-                  ->nullable()
-                  ->after('currency_code');
+            $table->string('currency_name')->nullable()->after('currency_symbol');
         });
     }
 
     public function down(): void
     {
         Schema::table('countries', function (Blueprint $table) {
-            $table->dropColumn('currency_symbol');
+            $table->dropColumn('currency_name');
         });
     }
 };

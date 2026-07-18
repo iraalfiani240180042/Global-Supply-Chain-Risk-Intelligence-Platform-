@@ -9,23 +9,52 @@ use Illuminate\Http\Request;
 
 class PortController extends Controller
 {
+    /**
+     * Port Dashboard
+     */
     public function index()
     {
         $ports = Port::with(['country', 'status'])
             ->latest()
             ->paginate(20);
 
-        return view('ports.index', compact('ports'));
+        $countries = Country::orderBy('name')->get();
+
+        $totalPorts = Port::count();
+        $totalCountries = Country::count();
+        $activePorts = Port::whereHas('status', function ($q) {
+            $q->where('status', 'Active');
+        })->count();
+
+        $totalRegions = Country::distinct('region_id')->count('region_id');
+
+        return view('ports.index', compact(
+            'ports',
+            'countries',
+            'totalPorts',
+            'totalCountries',
+            'activePorts',
+            'totalRegions'
+        ));
     }
 
+    /**
+     * Form Create
+     */
     public function create()
     {
         $countries = Country::orderBy('name')->get();
         $statuses = PortStatus::orderBy('status')->get();
 
-        return view('ports.create', compact('countries', 'statuses'));
+        return view('ports.create', compact(
+            'countries',
+            'statuses'
+        ));
     }
 
+    /**
+     * Store
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -44,6 +73,9 @@ class PortController extends Controller
             ->with('success', 'Port added successfully.');
     }
 
+    /**
+     * Sync Dataset Port
+     */
     public function sync()
     {
         $file = storage_path('app/ports/allCountries.txt');
@@ -54,11 +86,13 @@ class PortController extends Controller
                 ->with('error', 'Dataset allCountries.txt tidak ditemukan.');
         }
 
-        $status = PortStatus::firstOrCreate([
+        $activeStatus = PortStatus::firstOrCreate([
             'status' => 'Active'
         ]);
 
         $handle = fopen($file, 'r');
+
+        $success = 0;
 
         while (($line = fgets($handle)) !== false) {
 
@@ -68,22 +102,72 @@ class PortController extends Controller
                 continue;
             }
 
-            $featureClass = $row[6];
             $featureCode  = $row[7];
 
-            // Tampilkan feature pertama yang dibaca
-            dd([
-                'Feature Class' => $featureClass,
-                'Feature Code'  => $featureCode,
-                'Name'          => $row[1],
-                'Country'       => $row[8],
-            ]);
+            // Hanya ambil pelabuhan berdasarkan feature code 'PRT'
+            if ($featureCode != 'PRT') {
+                continue;
+            }
+
+            $countryCode = strtoupper($row[8]);
+
+            $country = Country::where('iso_code', $countryCode)->first();
+
+            if (!$country) {
+                continue;
+            }
+
+            Port::updateOrCreate(
+                [
+                    'country_id' => $country->id,
+                    'name'       => $row[1],
+                ],
+                [
+                    'status_id' => $activeStatus->id,
+                    'city'      => $row[2] ?: $row[1],
+                    'latitude'  => $row[4],
+                    'longitude' => $row[5],
+                ]
+            );
+
+            $success++;
         }
 
         fclose($handle);
 
         return redirect()
             ->route('ports.index')
-            ->with('success', 'Done');
+            ->with('success', "$success ports imported successfully.");
+    }
+
+    /**
+     * Get ports by country ID
+     */
+    public function getPortsByCountry($country)
+    {
+        $ports = Port::where('country_id', $country)
+            ->orderBy('name')
+            ->get([
+                'id',
+                'name'
+            ]);
+
+        return response()->json($ports);
+    }
+
+    /**
+     * Get single port data details
+     */
+    public function getPortDetail(Port $port)
+    {
+        return response()->json([
+            'id' => $port->id,
+            'name' => $port->name,
+            'country' => $port->country->name,
+            'region' => $port->country->region->name ?? '-',
+            'latitude' => $port->latitude,
+            'longitude' => $port->longitude,
+            'status' => $port->status->status,
+        ]);
     }
 }

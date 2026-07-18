@@ -62,13 +62,19 @@
             </a>
         </li>
 
-        <li>
-            <a href="{{ route('comparison') }}"
-   class="{{ request()->routeIs('comparison') ? 'active' : '' }}">
-                Comparison
-            </a>
-        </li>
+        <li class="nav-item">
+    <a href="{{ route('comparison.index') }}" class="nav-link">
+        <i class="bi bi-bar-chart-line"></i>
+        Country Comparison
+    </a>
+</li>
 
+<li class="nav-item">
+    <a href="{{ route('articles.index') }}" class="nav-link">
+        <i class="bi bi-newspaper"></i>
+        <span>Artikel Analisis</span>
+    </a>
+</li>
         <li>
             <a href="{{ route('profile') }}"
    class="{{ request()->routeIs('profile') ? 'active' : '' }}">

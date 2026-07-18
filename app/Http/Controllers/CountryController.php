@@ -123,89 +123,39 @@ class CountryController extends Controller
         }
 
         // =====================
-        // Inflation (World Bank API)
+        // Inflation Trend (10 Tahun) & Current Inflation
         // =====================
         $inflation = null;
+        $inflationTrend = [];
+        $inflationIndexed = []; // Untuk mempermudah lookup tren risiko historis
 
         $response = Http::get(
             "https://api.worldbank.org/v2/country/{$country->iso_code}/indicator/FP.CPI.TOTL.ZG",
             [
                 'format' => 'json',
-                'per_page' => 1,
+                'per_page' => 10,
             ]
         );
 
         if ($response->successful()) {
-            $data = $response->json();
+            $data = $response->json()[1] ?? [];
 
-            if (isset($data[1][0]['value'])) {
-                $inflation = $data[1][0]['value'];
+            foreach (array_reverse($data) as $item) {
+                if ($item['value'] != null) {
+                    $val = round($item['value'], 2);
+                    $inflationTrend[] = [
+                        'year' => $item['date'],
+                        'value' => $val
+                    ];
+                    $inflationIndexed[$item['date']] = $val;
+                }
             }
+
+            $inflation = end($inflationTrend)['value'] ?? null;
         }
 
         // =====================
-        // Risk Analysis
-        // =====================
-        $riskScore = 0;
-
-        // GDP
-        if ($gdp) {
-            if ($gdp >= 1000000000000) {          // >= 1 Trillion
-                $riskScore += 30;
-            } elseif ($gdp >= 100000000000) {     // >= 100 Billion
-                $riskScore += 20;
-            } else {
-                $riskScore += 10;
-            }
-        }
-
-        // Inflation
-        if ($inflation !== null) {
-            if ($inflation < 3) {
-                $riskScore += 25;
-            } elseif ($inflation < 6) {
-                $riskScore += 15;
-            } else {
-                $riskScore += 5;
-            }
-        }
-
-        // Weather
-        if ($weather) {
-            if (in_array($weather['weather_code'], [0, 1, 2, 3])) {
-                $riskScore += 20;
-            } else {
-                $riskScore += 10;
-            }
-
-            // Wind
-            if ($weather['wind_speed_10m'] < 20) {
-                $riskScore += 15;
-            } else {
-                $riskScore += 5;
-            }
-        }
-
-        // Exchange Rate tersedia
-        if ($exchangeRate) {
-            $riskScore += 10;
-        }
-
-        // Tentukan kategori
-        $riskLevel = match (true) {
-            $riskScore >= 80 => 'Low Risk',
-            $riskScore >= 60 => 'Medium Risk',
-            default => 'High Risk',
-        };
-
-        $riskColor = match ($riskLevel) {
-            'Low Risk' => 'success',
-            'Medium Risk' => 'warning',
-            default => 'danger',
-        };
-
-        // =====================
-        // Latest News
+        // Latest News (GNews API)
         // =====================
         $news = [];
 
@@ -220,6 +170,184 @@ class CountryController extends Controller
             $news = $response->json()['articles'] ?? [];
         }
 
+        // ====================================
+        // RISK SCORE CALCULATION
+        // ====================================
+
+        // Weight
+        $weightWeather   = 0.25;
+        $weightInflation = 0.25;
+        $weightExchange  = 0.20;
+        $weightNews      = 0.30;
+
+        // ====================================
+        // WEATHER SCORE (0-100)
+        // ====================================
+        $weatherValue = 100;
+
+        if ($weather) {
+
+            if ($weather['wind_speed_10m'] > 30) {
+                $weatherValue = 30;
+            } elseif ($weather['wind_speed_10m'] > 20) {
+                $weatherValue = 60;
+            } elseif ($weather['wind_speed_10m'] > 10) {
+                $weatherValue = 80;
+            }
+
+            if ($weather['temperature_2m'] > 38) {
+                $weatherValue -= 20;
+            }
+
+            $weatherValue = max(0, min(100, $weatherValue));
+        }
+
+        // ====================================
+        // INFLATION SCORE
+        // ====================================
+        $inflationValue = 100;
+
+        if ($inflation !== null) {
+
+            if ($inflation >= 10) {
+                $inflationValue = 20;
+            } elseif ($inflation >= 6) {
+                $inflationValue = 50;
+            } elseif ($inflation >= 3) {
+                $inflationValue = 80;
+            }
+
+        }
+
+        // ====================================
+        // EXCHANGE SCORE
+        // ====================================
+        $exchangeValue = $exchangeRate ? 100 : 40;
+
+        // ====================================
+        // NEWS SCORE
+        // ====================================
+        $negativeWords = [
+            'war',
+            'conflict',
+            'crisis',
+            'strike',
+            'earthquake',
+            'tsunami',
+            'flood',
+            'inflation',
+            'protest',
+            'sanction'
+        ];
+
+        $negativeCount = 0;
+
+        foreach ($news as $item) {
+
+            $title = strtolower($item['title']);
+
+            foreach ($negativeWords as $word) {
+
+                if (str_contains($title, $word)) {
+                    $negativeCount++;
+                    break;
+                }
+
+            }
+
+        }
+
+        if ($negativeCount == 0) {
+            $newsValue = 100;
+        } elseif ($negativeCount <= 2) {
+            $newsValue = 70;
+        } elseif ($negativeCount <= 4) {
+            $newsValue = 40;
+        } else {
+            $newsValue = 20;
+        }
+
+        // ====================================
+        // FINAL RISK SCORE
+        // ====================================
+
+        $safeScore =
+            ($weatherValue * $weightWeather) +
+            ($inflationValue * $weightInflation) +
+            ($exchangeValue * $weightExchange) +
+            ($newsValue * $weightNews);
+
+        $riskScore = round(100 - $safeScore);
+
+        // ====================================
+        // LEVEL
+        // ====================================
+
+        if ($riskScore <= 30) {
+
+            $riskLevel = 'Low Risk';
+            $riskColor = 'success';
+
+        } elseif ($riskScore <= 60) {
+
+            $riskLevel = 'Medium Risk';
+            $riskColor = 'warning';
+
+        } else {
+
+            $riskLevel = 'High Risk';
+            $riskColor = 'danger';
+
+        }
+
+        // ====================================
+        // BREAKDOWN
+        // ====================================
+
+        $riskBreakdown = [
+            'Weather'        => round((100 - $weatherValue) * $weightWeather),
+            'Inflation'      => round((100 - $inflationValue) * $weightInflation),
+            'Exchange Rate'  => round((100 - $exchangeValue) * $weightExchange),
+            'News Sentiment' => round((100 - $newsValue) * $weightNews),
+        ];
+
+        // =====================
+        // Currency Trend (7 Hari Terakhir)
+        // =====================
+        $currencyTrend = [];
+
+        if ($country->currency_code) {
+            for ($i = 6; $i >= 0; $i--) {
+                $currencyTrend[] = [
+                    'day' => now()->subDays($i)->format('d M'),
+                    'value' => $exchangeRate
+                ];
+            }
+        }
+
+        // =====================
+        // Risk Trend (Berdasarkan Tren Historis Berbasis Tahun)
+        // =====================
+        $riskTrend = [];
+
+        foreach ($inflationTrend as $item) {
+
+            $score = 100;
+
+            if ($item['value'] >= 10) {
+                $score = 20;
+            } elseif ($item['value'] >= 6) {
+                $score = 50;
+            } elseif ($item['value'] >= 3) {
+                $score = 80;
+            }
+
+            $riskTrend[] = [
+                'year' => $item['year'],
+                'score' => 100 - $score
+            ];
+        }
+
         return view('countries.index', compact(
             'countries',
             'country',
@@ -231,7 +359,11 @@ class CountryController extends Controller
             'riskScore',
             'riskLevel',
             'riskColor',
-            'news'
+            'news',
+            'inflationTrend',
+            'currencyTrend',
+            'riskTrend',
+            'riskBreakdown'
         ));
     }
 
@@ -305,6 +437,13 @@ class CountryController extends Controller
             $objects = $result['data']['objects'] ?? [];
 
             foreach ($objects as $item) {
+                $isoCode = $item['codes']['alpha_2'] ?? null;
+
+                // Validasi agar tidak memasukkan nilai kosong pada unique key
+                if (!$isoCode) {
+                    continue;
+                }
+
                 $regionName = $item['region'] ?? 'Other';
 
                 $region = Region::firstOrCreate(
@@ -318,7 +457,7 @@ class CountryController extends Controller
 
                 Country::updateOrCreate(
                     [
-                        'iso_code' => $item['codes']['alpha_2'] ?? ''
+                        'iso_code' => $isoCode
                     ],
                     [
                         'region_id'       => $region->id,

@@ -246,7 +246,7 @@
                         </h5>
 
                         <p class="text-muted">
-                            Overall export destination risk based on GDP, inflation, weather, wind speed and exchange rate.
+                            Overall export destination risk based on weather conditions, inflation, exchange rate, and news sentiment.
                         </p>
                     @else
                         <h2 class="fw-bold text-warning">--</h2>
@@ -257,50 +257,19 @@
         </div>
     </div>
 
-    {{-- Latest News --}}
-    <div class="card shadow-sm border-0 mt-4">
-        <div class="card-body">
-            <h4 class="mb-3">📰 Latest News</h4>
-            <hr>
-            <div class="list-group list-group-flush">
-                @forelse($news as $item)
-                    <div class="list-group-item px-0 py-3">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                @if(!empty($item['image']))
-                                    <img src="{{ $item['image'] }}" 
-                                         class="img-fluid rounded border shadow-sm" 
-                                         style="height:110px; width:100%; object-fit:cover;" 
-                                         alt="{{ $item['title'] }}">
-                                @else
-                                    <div class="bg-light d-flex align-items-center justify-content-center rounded border" style="height:110px; width:100%;">
-                                        <i class="bi bi-image text-muted fs-2"></i>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="col-md-9">
-                                <h5 class="fw-bold text-dark mb-1">
-                                    {{ $item['title'] }}
-                                </h5>
-                                <small class="text-muted d-block mb-2">
-                                    <span class="badge bg-secondary me-1">{{ $item['source']['name'] ?? 'Unknown Source' }}</span>
-                                    • {{ \Carbon\Carbon::parse($item['publishedAt'])->format('d M Y') }}
-                                </small>
-                                <p class="text-secondary mb-3">
-                                    {{ \Illuminate\Support\Str::limit($item['description'] ?? '', 120) }}
-                                </p>
-                                <a href="{{ $item['url'] }}" target="_blank" class="btn btn-primary btn-sm rounded">
-                                    Read More
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-4">
-                        <p class="text-muted mb-0">No news available.</p>
-                    </div>
-                @endforelse
+    {{-- News Sentiment Card --}}
+    <div class="row mt-3">
+        <div class="col-lg-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5>📰 News Sentiment</h5>
+                    <h3 class="fw-bold">
+                        {{ $newsSentiment ?? 'Neutral' }}
+                    </h3>
+                    <p class="text-muted mb-0">
+                        Positive News : {{ $positiveNews ?? 0 }} | Negative News : {{ $negativeNews ?? 0 }}
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -308,12 +277,107 @@
     {{-- GDP Chart --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
-            <h4>
-                📈 GDP Trend
-            </h4>
+            <h4>📈 GDP Trend</h4>
             <hr>
             <div style="height:350px; position: relative;">
                 <canvas id="gdpChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- Inflation Trend --}}
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h4>📉 Inflation Trend</h4>
+            <hr>
+            <div style="height:350px; position: relative;">
+                <canvas id="inflationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- Currency Trend --}}
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h4>💱 Currency Trend</h4>
+            <hr>
+            <div style="height:350px; position: relative;">
+                <canvas id="currencyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- Risk Trend --}}
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h4>⚠ Risk Trend</h4>
+            <hr>
+            <div style="height:350px; position: relative;">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- Latest News --}}
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h4 class="mb-3">📰 Latest News</h4>
+            <hr>
+
+            <div class="list-group list-group-flush">
+                @forelse($news as $item)
+                    <div class="list-group-item px-0 py-3">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                @if(!empty($item['image']))
+                                    <img
+                                        src="{{ $item['image'] }}"
+                                        class="img-fluid rounded border shadow-sm"
+                                        style="height:110px;width:100%;object-fit:cover;"
+                                    >
+                                @ite
+                                @else
+                                    <div class="bg-light rounded border d-flex justify-content-center align-items-center"
+                                         style="height:110px;">
+                                        <i class="bi bi-image fs-2 text-muted"></i>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="col-md-9">
+                                <h5 class="fw-bold">
+                                    {{ $item['title'] }}
+                                </h5>
+
+                                <small class="text-muted">
+                                    <span class="badge bg-secondary">
+                                        {{ $item['source']['name'] ?? 'Unknown' }}
+                                    </span>
+                                    •
+                                    {{ \Carbon\Carbon::parse($item['publishedAt'])->format('d M Y') }}
+                                </small>
+
+                                <p class="mt-2 text-secondary">
+                                    {{ \Illuminate\Support\Str::limit($item['description'] ?? '',120) }}
+                                </p>
+
+                                <a
+                                    href="{{ $item['url'] }}"
+                                    target="_blank"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-0">
+                            No news available.
+                        </p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -324,23 +388,25 @@
             <h4>📌 Export Recommendation</h4>
             <hr>
             <ul class="mb-0">
-                @if($gdp)
-                    <li class="mb-2"><strong>Economy Analysis:</strong> Market size is substantial with a current GDP of ${{ number_format($gdp, 0) }} USD.</li>
-                @else
-                    <li class="mb-2"><strong>Economy Analysis:</strong> Market scale indicators are currently limited.</li>
-                @endif
+                <li class="mb-2">
+                    <strong>Weather:</strong>
+                    {{ $weather['description'] ?? '-' }}
+                </li>
 
-                @if(isset($weather))
-                    <li class="mb-2"><strong>Weather Recommendation:</strong> Present temperature is {{ $weather['temperature_2m'] }}°C ({{ $weather['description'] ?? 'Clear' }}). Ideal for scheduling typical logistics operations.</li>
-                @else
-                    <li class="mb-2"><strong>Weather Recommendation:</strong> Local weather forecast data is currently unavailable. Check regional channels before dispatching seasonal items.</li>
-                @endif
+                <li class="mb-2">
+                    <strong>Inflation:</strong>
+                    {{ $inflation ? number_format($inflation,2).'%' : '-' }}
+                </li>
 
-                @if($exchangeRate)
-                    <li class="mb-2"><strong>Currency Recommendation:</strong> Exchange rate is holding steady at 1 USD = {{ number_format($exchangeRate, 2) }} {{ $country->currency_code }}. Keep tabs on conversion volatility.</li>
-                @else
-                    <li class="mb-2"><strong>Currency Recommendation:</strong> Live exchange rate data could not be parsed.</li>
-                @endif
+                <li class="mb-2">
+                    <strong>Exchange Rate:</strong>
+                    1 USD = {{ $exchangeRate ? number_format($exchangeRate,2) : '-' }} {{ $country->currency_code }}
+                </li>
+
+                <li class="mb-2">
+                    <strong>News Sentiment:</strong>
+                    {{ $newsSentiment ?? 'Neutral' }}
+                </li>
 
                 <li><strong>Risk Recommendation:</strong> Monitor the latest local updates in the news stream above to watch out for real-time customs adjustments or distribution bottlenecks.</li>
             </ul>
@@ -362,58 +428,130 @@
 </div>
 
 {{-- External Libraries & Chart Script --}}
-@if(isset($country) && !empty($gdpTrend))
+@if(isset($country))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const rawData = @json($gdpTrend);
             
-            const labels = rawData.map(item => item.year);
-            const dataValues = rawData.map(item => item.value);
-
-            const ctx = document.getElementById('gdpChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'GDP (Billion USD)',
-                        data: dataValues,
-                        borderColor: '#0d6efd',
-                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.3,
-                        pointBackgroundColor: '#0d6efd',
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
+            // ==========================
+            // GDP Trend
+            // ==========================
+            @if(!empty($gdpTrend))
+                new Chart(document.getElementById('gdpChart'), {
+                    type: 'line',
+                    data: {
+                        labels: @json(array_column($gdpTrend, 'year')),
+                        datasets: [{
+                            label: 'GDP (Billion USD)',
+                            data: @json(array_column($gdpTrend, 'value')),
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, .15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: .35,
+                            pointBackgroundColor: '#0d6efd',
+                            pointRadius: 4
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: 'Billion USD'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Year'
-                            }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: false, title: { display: true, text: 'Billion USD' } },
+                            x: { title: { display: true, text: 'Year' } }
                         }
                     }
-                }
-            });
+                });
+            @endif
+
+            // ==========================
+            // Inflation Trend
+            // ==========================
+            @if(!empty($inflationTrend))
+                new Chart(document.getElementById('inflationChart'), {
+                    type: 'line',
+                    data: {
+                        labels: @json(array_column($inflationTrend, 'year')),
+                        datasets: [{
+                            label: 'Inflation %',
+                            data: @json(array_column($inflationTrend, 'value')),
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, .15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: .35,
+                            pointBackgroundColor: '#dc3545',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: false, title: { display: true, text: 'Percentage (%)' } },
+                            x: { title: { display: true, text: 'Year' } }
+                        }
+                    }
+                });
+            @endif
+
+            // ==========================
+            // Currency Trend
+            // ==========================
+            @if(!empty($currencyTrend))
+                new Chart(document.getElementById('currencyChart'), {
+                    type: 'line',
+                    data: {
+                        labels: @json(array_column($currencyTrend, 'day')),
+                        datasets: [{
+                            label: 'Exchange Rate',
+                            data: @json(array_column($currencyTrend, 'value')),
+                            borderColor: '#198754',
+                            backgroundColor: 'rgba(25, 135, 84, .15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: .35,
+                            pointBackgroundColor: '#198754',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: false, title: { display: true, text: 'Value against USD' } },
+                            x: { title: { display: true, text: 'Day' } }
+                        }
+                    }
+                });
+            @endif
+
+            // ==========================
+            // Risk Trend
+            // ==========================
+            @if(!empty($riskTrend))
+                new Chart(document.getElementById('riskChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: @json(array_column($riskTrend, 'year')),
+                        datasets: [{
+                            label: 'Risk Score',
+                            data: @json(array_column($riskTrend, 'score')),
+                            backgroundColor: '#ffc107',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, max: 100, title: { display: true, text: 'Risk Score (0-100)' } },
+                            x: { title: { display: true, text: 'Year' } }
+                        }
+                    }
+                });
+            @endif
+
         });
     </script>
 @endif

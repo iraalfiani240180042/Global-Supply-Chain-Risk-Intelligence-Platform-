@@ -1,111 +1,173 @@
 @extends('layouts.app')
 
-@section('title', 'News')
-
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container">
 
-    <h2>News Management</h2>
+    <h2 class="mb-4">News Intelligence</h2>
 
-    <a href="{{ route('news.sync') }}" class="btn btn-success">
-        <i class="bi bi-arrow-repeat"></i>
-        Sync News
-    </a>
+    <form method="GET" action="{{ route('news') }}">
 
-</div>
+        <div class="row mb-4">
 
-@if(session('success'))
+            <div class="col-md-5">
 
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
+                <label class="form-label">
+                    Pilih Negara
+                </label>
 
-@endif
+                <select class="form-select" name="country" id="country">
 
-@if(session('error'))
+                    <option value="">-- Pilih Negara --</option>
 
-<div class="alert alert-danger">
-    {{ session('error') }}
-</div>
+                    @foreach($countries as $item)
 
-@endif
+                        <option value="{{ $item->name }}"
+                            {{ $country==$item->name ? 'selected' : '' }}>
 
-<div class="card shadow-sm border-0">
+                            {{ $item->name }}
 
-    <div class="card-body">
+                        </option>
 
-        <table class="table table-hover align-middle">
+                    @endforeach
 
-            <thead class="table-light">
+                </select>
 
-                <tr>
-                    <th>No</th>
-                    <th>Title</th>
-                    <th>Source</th>
-                    <th>Country</th>
-                    <th>Category</th>
-                    <th>Published</th>
-                    <th>Link</th>
-                </tr>
+            </div>
 
-            </thead>
-
-            <tbody>
-
-                @forelse($news as $item)
-
-                <tr>
-
-                    <td>{{ $news->firstItem() + $loop->index }}</td>
-
-                    <td>{{ $item->title }}</td>
-
-                    <td>{{ $item->source }}</td>
-
-                    <td>{{ $item->country->name ?? '-' }}</td>
-
-                    <td>{{ $item->category->name ?? '-' }}</td>
-
-                    <td>{{ $item->published_at }}</td>
-
-                    <td>
-
-                        <a href="{{ $item->url }}"
-                           target="_blank"
-                           class="btn btn-primary btn-sm">
-
-                            Read
-
-                        </a>
-
-                    </td>
-
-                </tr>
-
-                @empty
-
-                <tr>
-
-                    <td colspan="7" class="text-center">
-
-                        No news available.
-
-                    </td>
-
-                </tr>
-
-                @endforelse
-
-            </tbody>
-
-        </table>
-
-        <div class="mt-3">
-
-            {{ $news->links() }}
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                    Pilih Negara
+                </button>
+            </div>
 
         </div>
+
+    </form>
+
+    @if($country)
+
+    <div class="mb-4">
+
+        <label class="form-label">
+            Pilih Kategori
+        </label>
+
+        @php
+            $categories = [
+                'Logistics' => '🚚',
+                'Trade' => '📦',
+                'Shipping' => '🚢',
+                'Economy' => '💰'
+            ];
+        @endphp
+
+        <div class="d-flex gap-3 flex-wrap">
+            @foreach($categories as $name => $icon)
+
+                <a href="{{ route('news', [
+                    'country' => $country,
+                    'category' => $name
+                ]) }}"
+                class="btn {{ $category == $name ? 'btn-primary' : 'btn-outline-primary' }}">
+
+                    {{ $icon }} {{ $name }}
+
+                </a>
+
+            @endforeach
+        </div>
+
+    </div>
+
+    @endif
+
+    @if($country && $category)
+
+    <h4 class="mb-4">
+
+        News :
+        <span class="text-primary">
+
+            {{ $country }}
+
+        </span>
+
+        -
+
+        <span class="text-success">
+
+            {{ $category }}
+
+        </span>
+
+    </h4>
+
+    @endif
+
+    <div class="row">
+
+        @forelse($articles as $article)
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card h-100">
+
+                @if(!empty($article['image']))
+                    <img src="{{ $article['image'] }}"
+                         class="card-img-top"
+                         alt="{{ $article['title'] }}">
+                @endif
+
+                <div class="card-body">
+
+                    <h5>{{ $article['title'] }}</h5>
+
+                    <p>{{ $article['description'] }}</p>
+
+                    <small class="text-muted">
+
+                        {{ $article['source']['name'] }}
+
+                    </small>
+
+                    <br>
+
+                    <small class="text-muted">
+
+                        {{ \Carbon\Carbon::parse($article['publishedAt'])->format('d M Y') }}
+
+                    </small>
+
+                    <br><br>
+
+                    <a href="{{ $article['url'] }}"
+                       target="_blank"
+                       class="btn btn-success">
+
+                        Read More
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        @empty
+
+            <div class="col-12">
+
+                <div class="alert alert-warning">
+
+                    Tidak ada berita ditemukan.
+
+                </div>
+
+            </div>
+
+        @endforelse
 
     </div>
 
