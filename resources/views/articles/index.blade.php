@@ -98,27 +98,21 @@ published:
 </p>
 
 <div class="mt-4">
+    <a href="{{ route('articles.show', $article->id) }}" class="btn btn-outline-primary">
+        <i class="bi bi-book"></i> Read More
+    </a>
+    <a href="{{ route('articles.edit', $article->id) }}" class="btn btn-warning">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
 
-<a href=""
-class="btn btn-outline-primary">
-
-Read More
-
-</a>
-
-<a href=""
-class="btn btn-warning">
-
-Edit
-
-</a>
-
-<button class="btn btn-danger">
-
-Delete
-
-</button>
-
+    <!-- Form Delete -->
+    <form action="{{ route('articles.destroy', $article->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini?');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+        </button>
+    </form>
 </div>
 
 </div>
