@@ -31,10 +31,11 @@ class WeatherController extends Controller
             if ($country) {
                 // Mengambil data cuaca saat ini dan tren suhu sekaligus dari API Open-Meteo
                 if ($country->latitude && $country->longitude) {
+                    // 1. Perubahan parameter 'current' di index()
                     $response = Http::get('https://api.open-meteo.com/v1/forecast', [
                         'latitude' => $country->latitude,
                         'longitude' => $country->longitude,
-                        'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',
+                        'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,rain,precipitation',
                         'hourly' => 'temperature_2m',
                         'forecast_days' => 1,
                         'timezone' => 'auto',
@@ -42,15 +43,27 @@ class WeatherController extends Controller
 
                     if ($response->successful()) {
                         $result = $response->json();
+                        
 
-                        // Memetakan respons API ke array $weather
+                        // 2. Menambahkan Rainfall dan Precipitation ke array $weather
                         $weather = [
                             'temperature' => $result['current']['temperature_2m'],
                             'humidity' => $result['current']['relative_humidity_2m'],
                             'wind_speed' => $result['current']['wind_speed_10m'],
                             'weather_code' => $result['current']['weather_code'],
                             'condition' => $this->getWeatherName($result['current']['weather_code']),
+                            'rainfall' => $result['current']['rain'] ?? 0,
+                            'precipitation' => $result['current']['precipitation'] ?? 0,
                         ];
+
+                        // 3. Menambahkan Status Badai (Storm Status)
+                        $weather['storm'] = false;
+                        if (
+                            $weather['weather_code'] >= 95 ||
+                            $weather['wind_speed'] >= 50
+                        ) {
+                            $weather['storm'] = true;
+                        }
 
                         // Memetakan tren suhu per jam
                         if (isset($result['hourly']['time'])) {
@@ -143,12 +156,13 @@ class WeatherController extends Controller
             Log::info("Sync Weather: {$country->id} - {$country->name}");
 
             try {
+                // 1. Perubahan parameter 'current' di sync()
                 $response = Http::timeout(3)
                     ->retry(1, 1000)
                     ->get('https://api.open-meteo.com/v1/forecast', [
                         'latitude' => $country->latitude,
                         'longitude' => $country->longitude,
-                        'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code'
+                        'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,rain,precipitation'
                     ]);
 
                 if (!$response->successful()) {

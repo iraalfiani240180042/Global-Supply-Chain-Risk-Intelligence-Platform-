@@ -10,7 +10,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-1">
-                💱 Currency Impact Dashboard
+                Currency Impact Dashboard
             </h2>
             <p class="text-muted mb-0">
                 Monitor exchange rates and export currency risks.
@@ -19,7 +19,7 @@
     </div>
 
     {{-- Select Country --}}
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card dashboard-card mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('currency') }}">
                 <div class="row align-items-end">
@@ -50,10 +50,10 @@
     <div class="row mb-4">
         {{-- Card 1: Exchange Rate & Change Percent --}}
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card summary-card h-100">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <h6 class="text-muted mb-3">
-                        💵 Exchange Rate
+                        Exchange Rate
                     </h6>
                     <div>
                         <h3 class="fw-bold mb-0 text-dark">
@@ -91,10 +91,10 @@
 
         {{-- Card 2: Trend Status --}}
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card summary-card h-100">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <h6 class="text-muted mb-3">
-                        📈 Trend Status
+                        Trend Status
                     </h6>
                     <h3 class="fw-bold mb-0">
                         @if($trendStatus == 'Increasing')
@@ -117,13 +117,13 @@
 
         {{-- Card 3: Risk Level --}}
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card summary-card h-100">
                 <div class="card-body d-flex flex-column justify-content-between">
                     <h6 class="text-muted mb-3">
-                        ⚠ Risk Level
+                        Risk Level
                     </h6>
                     <div>
-                        <span class="badge bg-{{ $riskColor ?? 'success' }} fs-6">
+                        <span class="badge bg-{{ $riskColor ?? 'success' }} px-3 py-2 fs-6 rounded-pill">
                             {{ $risk ?? 'Low Risk' }}
                         </span>
                     </div>
@@ -133,10 +133,10 @@
     </div>
 
     {{-- Chart --}}
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card dashboard-card mb-4">
         <div class="card-body">
             <h5 class="fw-bold mb-3">
-                📈 Exchange Rate Trend
+                Exchange Rate Trend
             </h5>
             
             <div style="height: 350px; position: relative;">
@@ -154,10 +154,10 @@
     {{-- Information & Recommendation --}}
     <div class="row">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card dashboard-card h-100">
                 <div class="card-body">
                     <h5 class="fw-bold mb-3">
-                        💱 Currency Information
+                        Currency Information
                     </h5>
                     <table class="table table-borderless mb-0">
                         <tr>
@@ -172,20 +172,16 @@
                             <th class="ps-0 text-muted">Code</th>
                             <td class="pe-0 text-dark font-monospace">{{ $country->currency_code }}</td>
                         </tr>
-                        <tr>
-                            <th class="ps-0 text-muted">Symbol</th>
-                            <td class="pe-0 text-dark">{{ $country->currency_symbol }}</td>
-                        </tr>
                     </table>
                 </div>
             </div>
         </div>
 
         <div class="col-md-8">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card dashboard-card h-100">
                 <div class="card-body">
                     <h5 class="fw-bold mb-3">
-                        📌 Currency Recommendation
+                        Currency Recommendation
                     </h5>
                     
                     @if(isset($recommendation))

@@ -10,19 +10,19 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-1">
-                🚢 Port Location Dashboard
+                Port Location Dashboard
             </h2>
             <p class="text-muted mb-0">
                 Monitor global seaports and analyze international logistics routes.
             </p>
         </div>
         <div>
-            <a href="{{ route('ports.sync') }}" class="btn btn-success me-2">
+            <a href="{{ route('ports.sync') }}" class="btn btn-success rounded-pill px-4 me-2">
                 <i class="bi bi-arrow-repeat"></i>
                 Sync Ports
             </a>
 
-            <a href="{{ route('ports.create') }}" class="btn btn-primary">
+            <a href="{{ route('ports.create') }}" class="btn btn-primary rounded-pill px-4">
                 <i class="bi bi-plus-circle"></i>
                 Add Port
             </a>
@@ -46,13 +46,13 @@
         </div>
     @endif
 
-    {{-- Search & Filter (Updated to 2 columns with labels) --}}
+    {{-- Search & Filter --}}
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">
-                        🌍 Country
+                        Country
                     </label>
                     <select id="countrySelect" class="form-select">
                         <option value="">
@@ -68,7 +68,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">
-                        🚢 Port
+                        Port
                     </label>
                     <select id="portSelect" class="form-select">
                         <option value="">
@@ -83,12 +83,12 @@
     {{-- Statistics --}}
     <div class="row mb-4">
         <div class="col-lg-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card stat-card border-0">
                 <div class="card-body">
-                    <h6 class="text-muted">
+                    <small class="text-muted">
                         Total Ports
-                    </h6>
-                    <h2 class="fw-bold text-primary">
+                    </small>
+                    <h2 class="fw-bold text-primary mt-2">
                         {{ $totalPorts }}
                     </h2>
                 </div>
@@ -96,12 +96,12 @@
         </div>
 
         <div class="col-lg-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card stat-card border-0">
                 <div class="card-body">
-                    <h6 class="text-muted">
+                    <small class="text-muted">
                         Countries
-                    </h6>
-                    <h2 class="fw-bold text-success">
+                    </small>
+                    <h2 class="fw-bold text-success mt-2">
                         {{ $totalCountries }}
                     </h2>
                 </div>
@@ -109,12 +109,12 @@
         </div>
 
         <div class="col-lg-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card stat-card border-0">
                 <div class="card-body">
-                    <h6 class="text-muted">
+                    <small class="text-muted">
                         Active Ports
-                    </h6>
-                    <h2 class="fw-bold text-warning">
+                    </small>
+                    <h2 class="fw-bold text-warning mt-2">
                         {{ $activePorts }}
                     </h2>
                 </div>
@@ -122,12 +122,12 @@
         </div>
 
         <div class="col-lg-3">
-            <div class="card border-0 shadow-sm">
+            <div class="card stat-card border-0">
                 <div class="card-body">
-                    <h6 class="text-muted">
+                    <small class="text-muted">
                         Regions
-                    </h6>
-                    <h2 class="fw-bold text-danger">
+                    </small>
+                    <h2 class="fw-bold text-danger mt-2">
                         {{ $totalRegions }}
                     </h2>
                 </div>
@@ -135,14 +135,14 @@
         </div>
     </div>
 
-    {{-- Main Layout (Updated: Map is now Full Width) --}}
+    {{-- Main Layout --}}
     <div class="row">
         {{-- Map --}}
         <div class="col-lg-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card dashboard-card">
                 <div class="card-header bg-white">
                     <strong>
-                        🌍 Interactive World Map
+                        Interactive World Map
                     </strong>
                 </div>
                 <div class="card-body">
@@ -151,10 +151,10 @@
             </div>
 
             {{-- Information --}}
-            <div class="card border-0 shadow-sm mt-4">
+            <div class="card dashboard-card mt-4">
                 <div class="card-body">
                     <h5>
-                        📍 Port Information
+                        Port Information
                     </h5>
                     <hr>
                     <div class="row">
@@ -304,3 +304,56 @@
     }
 </script>
 @endpush
+
+{{-- Menyisipkan custom CSS langsung di file --}}
+<style>
+    /* Dashboard Card */
+    .dashboard-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+        transition: .35s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 45px rgba(0,0,0,.15);
+    }
+
+    /* Statistic Card */
+    .stat-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.08);
+        transition: .3s;
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(13,110,253,.20);
+    }
+
+    .stat-card h2 {
+        font-size: 2rem;
+    }
+
+    /* Form */
+    .form-select {
+        border-radius: 12px;
+        min-height: 48px;
+    }
+
+    /* Header */
+    .card-header {
+        background: #fff;
+        border-bottom: 1px solid #ececec;
+        font-weight: 600;
+    }
+
+    /* Badge */
+    .badge {
+        padding: 8px 15px;
+        border-radius: 8px;
+    }
+</style>

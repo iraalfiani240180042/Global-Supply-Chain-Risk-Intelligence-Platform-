@@ -4,30 +4,72 @@
 
 @section('content')
 
+{{-- Custom Style Terintegrasi --}}
+<style>
+    /* Dashboard Card */
+    .dashboard-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.08);
+        transition: .35s ease;
+        overflow: hidden;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 45px rgba(13,110,253,.15);
+    }
+
+    /* Weather Summary */
+    .dashboard-card h3 {
+        font-size: 1.7rem;
+    }
+
+    .dashboard-card h6 {
+        font-weight: 600;
+    }
+
+    /* Badge */
+    .badge {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: .85rem;
+    }
+
+    /* Select */
+    .form-select {
+        min-height: 48px;
+        border-radius: 12px;
+    }
+
+    /* List */
+    .list-group-item {
+        background: transparent;
+    }
+</style>
+
 <div class="container-fluid">
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold">
-                走 Weather & Logistics Dashboard
+                Weather & Logistics Dashboard
             </h2>
             <p class="text-muted mb-0">
                 Monitor weather conditions for export destination analysis.
             </p>
         </div>
-
-
     </div>
 
     {{-- Select Country (Auto Submit on Change) --}}
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card dashboard-card h-100 mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('weather') }}">
                 <div class="row">
                     <div class="col-md-12">
                         <label class="form-label fw-semibold">
-                            🌍 Select Country
+                            Select Country
                         </label>
                         <select name="country" class="form-select" onchange="this.form.submit()">
                             <option value="">
@@ -49,59 +91,113 @@
     @if($country)
 
     {{-- Current Weather --}}
+
+    {{-- Baris 1 --}}
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 text-center h-100">
+
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100 text-center">
                 <div class="card-body">
-                    <h6 class="text-muted mb-2"> Pergantian Suhu 🌡 Temperature</h6>
-                    <h3 class="fw-bold text-danger mb-0">
-                        {{ $weather ? $weather['temperature'] . '°C' : '--' }}
+                    <h6 class="text-muted mb-2">Temperature</h6>
+                    <h3 class="fw-bold text-danger mb-1">
+                        {{ $weather['temperature'] ?? '--' }}°C
                     </h3>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 text-center h-100">
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100 text-center">
                 <div class="card-body">
-                    <h6 class="text-muted mb-2">💧 Humidity</h6>
-                    <h3 class="fw-bold text-info mb-0">
-                        {{ $weather ? $weather['humidity'] . '%' : '--' }}
+                    <h6 class="text-muted mb-2">Humidity</h6>
+                    <h3 class="fw-bold text-info mb-1">
+                        {{ $weather['humidity'] ?? '--' }}%
                     </h3>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 text-center h-100">
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100 text-center">
                 <div class="card-body">
-                    <h6 class="text-muted mb-2">💨 Wind Speed</h6>
-                    <h3 class="fw-bold text-success mb-0">
-                        {{ $weather ? $weather['wind_speed'] . ' km/h' : '--' }}
+                    <h6 class="text-muted mb-2">Wind Speed</h6>
+                    <h3 class="fw-bold text-success mb-1">
+                        {{ $weather['wind_speed'] ?? '--' }} km/h
                     </h3>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 text-center h-100">
+    </div>
+
+    {{-- Baris 2 --}}
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100 text-center">
                 <div class="card-body">
-                    <h6 class="text-muted mb-2">🌤 Condition</h6>
-                    <h5 class="fw-bold mb-0 text-dark">
-                        {{ $weather ? $weather['condition'] : '--' }}
-                    </h5>
+                    <h6 class="text-muted mb-2">Rainfall</h6>
+
+                    @if($weather)
+                        @if($weather['rainfall'] > 10)
+                            <h3 class="fw-bold text-danger">Heavy Rain</h3>
+                        @elseif($weather['rainfall'] > 0)
+                            <h3 class="fw-bold text-warning">Light Rain</h3>
+                        @else
+                            <h3 class="fw-bold text-success">No Rain</h3>
+                        @endif
+
+                        <small class="text-muted">
+                            {{ $weather['rainfall'] }} mm
+                        </small>
+                    @endif
+
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Storm</h6>
+
+                    @if($weather)
+                        @if($weather['storm'])
+                            <h3 class="fw-bold text-danger">High Risk</h3>
+                            <span class="badge bg-danger">Storm Detected</span>
+                        @elseif($weather['wind_speed'] >= 30)
+                            <h3 class="fw-bold text-warning">Moderate</h3>
+                            <span class="badge bg-warning text-dark">Strong Wind</span>
+                        @else
+                            <h3 class="fw-bold text-success">Safe</h3>
+                            <span class="badge bg-success">No Storm</span>
+                        @endif
+                    @endif
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card dashboard-card h-100 text-center">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Condition</h6>
+                    <h3 class="fw-bold text-dark">
+                        {{ $weather['condition'] ?? '--' }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     {{-- Map + Chart --}}
     <div class="row mb-4">
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-card h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">
-                        🌍 Global Weather Monitoring
+                        Global Weather Monitoring
                     </h5>
                     <hr>
                     {{-- OpenStreetMap Container --}}
@@ -111,10 +207,10 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-card h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">
-                        📈 Temperature Trend
+                        Temperature Trend
                     </h5>
                     <hr>
                     <div style="height:400px; position: relative;">
@@ -134,14 +230,14 @@
     {{-- Logistics + Recommendation --}}
     <div class="row mb-4">
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-card h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">
-                        🚢 Logistics Impact
+                        Logistics Impact
                     </h5>
                     <hr>
                     @if($logisticsStatus)
-                        <div class="alert alert-{{ $logisticsColor }} mb-0">
+                        <div class="alert alert-{{ $logisticsColor }} rounded-4 border-0 shadow-sm mb-0">
                             <h4 class="alert-heading fw-bold">{{ $logisticsStatus }}</h4>
                             <p class="mb-0">
                                 Logistics assessment is currently flagged as <strong>{{ $logisticsStatus }}</strong> based on the real-time weather metrics collected.
@@ -157,10 +253,10 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-card h-100">
                 <div class="card-body">
                     <h5 class="fw-bold">
-                        📌 Weather Recommendation
+                        Weather Recommendation
                     </h5>
                     <hr>
                     @if(!empty($weatherRecommendations))
@@ -208,9 +304,40 @@
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(map);
 
+                // Popup lengkap info cuaca (Tanpa Emoji)
+                let popup = `
+                    <b>{{ $country->name }}</b><br>
+                    Temperature : {{ $weather['temperature'] ?? '--' }} °C<br>
+                    Humidity : {{ $weather['humidity'] ?? '--' }} %<br>
+                    Wind Speed : {{ $weather['wind_speed'] ?? '--' }} km/h<br>
+                    Rainfall : {{ $weather['rainfall'] ?? 0 }} mm<br>
+                    Storm : {{ !empty($weather['storm']) ? 'Yes' : 'No' }}
+                `;
+
                 L.marker([lat, lng]).addTo(map)
-                    .bindPopup('<b>{{ $country->name }}</b><br>Lat: ' + lat + ', Lng: ' + lng)
+                    .bindPopup(popup)
                     .openPopup();
+
+                // Tambahkan Lingkaran Warna berdasarkan kondisi cuaca ekstrim
+                const isStorm = {{ !empty($weather['storm']) ? 'true' : 'false' }};
+                const rainfall = {{ $weather['rainfall'] ?? 0 }};
+
+                if (isStorm) {
+                    L.circle([lat, lng], {
+                        radius: 50000,
+                        color: 'red',
+                        fillColor: 'red',
+                        fillOpacity: 0.4
+                    }).addTo(map);
+                } else if (rainfall > 2.5) { 
+                    L.circle([lat, lng], {
+                        radius: 30000,
+                        color: 'blue',
+                        fillColor: '#4da6ff',
+                        fillOpacity: 0.35
+                    }).addTo(map);
+                }
+
             } else {
                 document.getElementById('weatherMap').innerHTML = 
                     '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Geographical coordinates missing for map projection.</div>';

@@ -57,7 +57,7 @@
                 class="form-select form-select-lg" 
                 onchange="if(this.value!='') window.location=this.value">
                 <option value="">
-                    🌍 Select Country
+                    Select Country
                 </option>
                 @foreach($countries as $item)
                     <option 
@@ -89,7 +89,7 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">🌍 Region</h6>
+                    <h6 class="text-muted">Region</h6>
                     <h4 class="fw-bold">
                         {{ $country->region->name ?? '-' }}
                     </h4>
@@ -100,7 +100,7 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">🏛 Capital</h6>
+                    <h6 class="text-muted">Capital</h6>
                     <h4 class="fw-bold">
                         {{ $country->capital }}
                     </h4>
@@ -111,7 +111,7 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">👥 Population</h6>
+                    <h6 class="text-muted">Population</h6>
                     <h4 class="fw-bold">
                         {{ number_format($country->population) }}
                     </h4>
@@ -126,16 +126,13 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">💵 Currency</h6>
+                    <h6 class="text-muted">Currency</h6>
                     <h4 class="fw-bold text-success">
                         {{ $country->currency_code }}
                     </h4>
                     <p class="mb-1">
                         {{ $country->currency_name }}
                     </p>
-                    <small class="text-muted">
-                        {{ $country->currency_symbol }}
-                    </small>
                 </div>
             </div>
         </div>
@@ -144,7 +141,7 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">📈 GDP</h6>
+                    <h6 class="text-muted">GDP</h6>
                     @if($gdp)
                         <h4 class="fw-bold text-primary">
                             ${{ number_format($gdp, 0) }}
@@ -163,7 +160,7 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">📉 Inflation</h6>
+                    <h6 class="text-muted">Inflation</h6>
                     @if($inflation)
                         <h4 class="fw-bold text-danger">
                             {{ number_format($inflation, 2) }}%
@@ -182,7 +179,7 @@
         <div class="col-lg-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">🌦 Weather</h6>
+                    <h6 class="text-muted">Weather</h6>
                     @if(isset($weather))
                         <h3 class="fw-bold text-warning mb-1">
                             {{ $weather['temperature_2m'] }}°C
@@ -212,7 +209,7 @@
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h4 class="mb-3">💱 Exchange Rate</h4>
+                    <h4 class="mb-3">Exchange Rate</h4>
                     <h2 class="fw-bold text-success">
                         @if($exchangeRate)
                             1 USD = {{ number_format($exchangeRate, 2) }} {{ $country->currency_code }}
@@ -228,7 +225,7 @@
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h4 class="mb-3">⚠ Risk Analysis</h4>
+                    <h4 class="mb-3">Risk Analysis</h4>
                     @if(isset($riskLevel))
                         <h2 class="fw-bold text-{{ $riskColor }}">
                             {{ $riskLevel }}
@@ -262,7 +259,7 @@
         <div class="col-lg-12">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h5>📰 News Sentiment</h5>
+                    <h5>News Sentiment</h5>
                     <h3 class="fw-bold">
                         {{ $newsSentiment ?? 'Neutral' }}
                     </h3>
@@ -277,7 +274,7 @@
     {{-- GDP Chart --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
-            <h4>📈 GDP Trend</h4>
+            <h4>GDP Trend</h4>
             <hr>
             <div style="height:350px; position: relative;">
                 <canvas id="gdpChart"></canvas>
@@ -288,7 +285,7 @@
     {{-- Inflation Trend --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
-            <h4>📉 Inflation Trend</h4>
+            <h4>Inflation Trend</h4>
             <hr>
             <div style="height:350px; position: relative;">
                 <canvas id="inflationChart"></canvas>
@@ -299,7 +296,7 @@
     {{-- Currency Trend --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
-            <h4>💱 Currency Trend</h4>
+            <h4>Currency Trend</h4>
             <hr>
             <div style="height:350px; position: relative;">
                 <canvas id="currencyChart"></canvas>
@@ -310,7 +307,7 @@
     {{-- Risk Trend --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
-            <h4>⚠ Risk Trend</h4>
+            <h4>Risk Trend</h4>
             <hr>
             <div style="height:350px; position: relative;">
                 <canvas id="riskChart"></canvas>
@@ -321,7 +318,7 @@
     {{-- Latest News --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
-            <h4 class="mb-3">📰 Latest News</h4>
+            <h4 class="mb-3">Latest News</h4>
             <hr>
 
             <div class="list-group list-group-flush">
@@ -335,7 +332,6 @@
                                         class="img-fluid rounded border shadow-sm"
                                         style="height:110px;width:100%;object-fit:cover;"
                                     >
-                                @ite
                                 @else
                                     <div class="bg-light rounded border d-flex justify-content-center align-items-center"
                                          style="height:110px;">
@@ -385,7 +381,7 @@
     {{-- Recommendation --}}
     <div class="card shadow-sm border-0 mt-4 mb-5">
         <div class="card-body">
-            <h4>📌 Export Recommendation</h4>
+            <h4>Export Recommendation</h4>
             <hr>
             <ul class="mb-0">
                 <li class="mb-2">

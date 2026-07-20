@@ -4,173 +4,185 @@
 
 <div class="container">
 
-    <h2 class="mb-4">News Intelligence</h2>
+    {{-- 1. Header Update --}}
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            News Intelligence Dashboard
+        </h2>
+        <p class="text-muted mb-0">
+            Monitor the latest logistics, trade, shipping, and economic news from selected countries.
+        </p>
+    </div>
 
-    <form method="GET" action="{{ route('news') }}">
-
-        <div class="row mb-4">
-
-            <div class="col-md-5">
-
-                <label class="form-label">
-                    Pilih Negara
-                </label>
-
-                <select class="form-select" name="country" id="country">
-
-                    <option value="">-- Pilih Negara --</option>
-
-                    @foreach($countries as $item)
-
-                        <option value="{{ $item->name }}"
-                            {{ $country==$item->name ? 'selected' : '' }}>
-
-                            {{ $item->name }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary">
-                    Pilih Negara
-                </button>
-            </div>
-
+    {{-- 2. Bungkus Filter dalam Card --}}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('news') }}">
+                <div class="row align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Select Country
+                        </label>
+                        <select class="form-select" name="country">
+                            <option value="">
+                                Choose Country
+                            </option>
+                            @foreach($countries as $item)
+                                <option value="{{ $item->name }}"
+                                    {{ $country == $item->name ? 'selected' : '' }}>
+                                    {{ $item->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-
-    </form>
+    </div>
 
     @if($country)
 
+    {{-- 3. Kategori dengan Model Grid Card --}}
     <div class="mb-4">
-
-        <label class="form-label">
-            Pilih Kategori
-        </label>
-
+        <label class="form-label fw-semibold mb-2">Select Category</label>
         @php
             $categories = [
-                'Logistics' => '🚚',
-                'Trade' => '📦',
-                'Shipping' => '🚢',
-                'Economy' => '💰'
+                'Logistics',
+                'Trade',
+                'Shipping',
+                'Economy'
             ];
         @endphp
 
-        <div class="d-flex gap-3 flex-wrap">
-            @foreach($categories as $name => $icon)
-
-                <a href="{{ route('news', [
-                    'country' => $country,
-                    'category' => $name
-                ]) }}"
-                class="btn {{ $category == $name ? 'btn-primary' : 'btn-outline-primary' }}">
-
-                    {{ $icon }} {{ $name }}
-
-                </a>
-
+        <div class="row g-3 mb-4">
+            @foreach($categories as $name)
+                <div class="col-md-3">
+                    <a href="{{ route('news', ['country' => $country, 'category' => $name]) }}" class="text-decoration-none">
+                        <div class="card category-card h-100 border-0 shadow-sm {{ $category == $name ? 'active-category' : '' }}">
+                            <div class="card-body text-center">
+                                <h6 class="fw-semibold mb-0">
+                                    {{ $name }}
+                                </h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             @endforeach
         </div>
-
     </div>
 
     @endif
 
+    {{-- 4. Judul Berita Aktif --}}
     @if($country && $category)
-
-    <h4 class="mb-4">
-
-        News :
-        <span class="text-primary">
-
-            {{ $country }}
-
-        </span>
-
-        -
-
-        <span class="text-success">
-
-            {{ $category }}
-
-        </span>
-
-    </h4>
-
+    <div class="mb-4">
+        <h4 class="fw-bold">
+            Latest News
+        </h4>
+        <p class="text-muted">
+            Showing <strong>{{ $category }}</strong> news from <strong>{{ $country }}</strong>
+        </p>
+    </div>
     @endif
 
+    {{-- Grid List Berita --}}
     <div class="row">
-
         @forelse($articles as $article)
-
         <div class="col-md-6 mb-4">
-
-            <div class="card h-100">
-
+            {{-- 5. Card Berita Modern --}}
+            <div class="card border-0 shadow-sm h-100 news-card">
                 @if(!empty($article['image']))
-                    <img src="{{ $article['image'] }}"
-                         class="card-img-top"
-                         alt="{{ $article['title'] }}">
+                    <img src="{{ $article['image'] }}" class="card-img-top" style="height:220px; object-fit:cover;">
                 @endif
-
-                <div class="card-body">
-
-                    <h5>{{ $article['title'] }}</h5>
-
-                    <p>{{ $article['description'] }}</p>
-
-                    <small class="text-muted">
-
-                        {{ $article['source']['name'] }}
-
-                    </small>
-
-                    <br>
-
-                    <small class="text-muted">
-
-                        {{ \Carbon\Carbon::parse($article['publishedAt'])->format('d M Y') }}
-
-                    </small>
-
-                    <br><br>
-
-                    <a href="{{ $article['url'] }}"
-                       target="_blank"
-                       class="btn btn-success">
-
-                        Read More
-
+                <div class="card-body d-flex flex-column">
+                    <h5 class="fw-bold">
+                        {{ $article['title'] }}
+                    </h5>
+                    <p class="text-muted flex-grow-1">
+                        {{ \Illuminate\Support\Str::limit($article['description'], 120) }}
+                    </p>
+                    <div class="small text-secondary mb-3">
+                        <div class="mb-1">
+                            <i class="bi bi-building me-1"></i>
+                            {{ $article['source']['name'] }}
+                        </div>
+                        <div>
+                            <i class="bi bi-calendar3 me-1"></i>
+                            {{ \Carbon\Carbon::parse($article['publishedAt'])->format('d M Y') }}
+                        </div>
+                    </div>
+                    <a href="{{ $article['url'] }}" target="_blank" class="btn btn-primary mt-auto">
+                        Read Full Article
                     </a>
-
                 </div>
-
             </div>
-
         </div>
-
         @empty
-
+            @if($country && $category)
             <div class="col-12">
-
-                <div class="alert alert-warning">
-
-                    Tidak ada berita ditemukan.
-
+                <div class="alert alert-warning border-0 shadow-sm" style="border-radius: 10px;">
+                    Tidak ada berita ditemukan untuk kombinasi negara dan kategori ini.
                 </div>
-
             </div>
-
+            @endif
         @endforelse
-
     </div>
 
 </div>
+
+{{-- 6. Tambahkan Kustom CSS --}}
+<style>
+    .category-card {
+        border-radius: 12px;
+        transition: .3s;
+        cursor: pointer;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0,0,0,.15) !important;
+    }
+
+    .active-category {
+        background: #0d6efd;
+        color: #fff;
+    }
+
+    .active-category h6 {
+        color: #fff;
+    }
+
+    .news-card {
+        transition: .3s;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .news-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 18px 35px rgba(0,0,0,.18) !important;
+    }
+
+    .card-img-top {
+        transition: .4s;
+    }
+
+    .news-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .btn {
+        border-radius: 10px;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+</style>
 
 @endsection
