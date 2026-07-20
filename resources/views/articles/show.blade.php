@@ -17,8 +17,6 @@
         </div>
 
         <div>
-           
-
             <a href="{{ route('articles.index') }}"
                class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i>
@@ -31,6 +29,15 @@
     <div class="card shadow-sm">
 
         <div class="card-body">
+
+            {{-- Article Image --}}
+            @if($article->image)
+                <div class="mb-4">
+                    <img src="{{ asset('storage/'.$article->image) }}"
+                         class="img-fluid rounded shadow-sm w-100"
+                         style="height:400px; object-fit:cover;">
+                </div>
+            @endif
 
             {{-- Category --}}
             <span class="badge bg-primary mb-3">

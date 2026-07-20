@@ -11,7 +11,9 @@
 
             <h2 class="fw-bold mb-4">Create Analysis Article</h2>
 
-            <form action="{{ route('articles.store') }}" method="POST">
+            <form action="{{ route('articles.store') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
                 @csrf
 
                 {{-- Title --}}
@@ -49,22 +51,35 @@
 
                 {{-- Category --}}
                 <div class="mb-3">
-    <label class="form-label">Category</label>
+                    <label class="form-label">Category</label>
 
-    <select name="category" class="form-select" required>
+                    <select name="category" class="form-select" required>
 
-        <option value="">-- Select Category --</option>
+                        <option value="">-- Select Category --</option>
+                        <option value="Market Analysis">Market Analysis</option>
+                        <option value="Export Opportunity">Export Opportunity</option>
+                        <option value="Risk Analysis">Risk Analysis</option>
+                        <option value="Logistics">Logistics</option>
 
-        <option value="Market Analysis">Market Analysis</option>
+                    </select>
+                </div>
 
-        <option value="Export Opportunity">Export Opportunity</option>
+                {{-- Article Image --}}
+                <div class="mb-3">
+                    <label class="form-label">
+                        Article Image
+                    </label>
 
-        <option value="Risk Analysis">Risk Analysis</option>
+                    <input
+                        type="file"
+                        name="image"
+                        class="form-control"
+                        accept="image/*">
 
-        <option value="Logistics">Logistics</option>
-
-    </select>
-</div>
+                    <small class="text-muted">
+                        JPG, PNG, JPEG (Max 2 MB)
+                    </small>
+                </div>
 
                 {{-- Summary --}}
                 <div class="mb-3">
@@ -113,6 +128,27 @@
 
                         <option value="1">Recommended</option>
                         <option value="0">Not Recommended</option>
+
+                    </select>
+                </div>
+
+                {{-- Status --}}
+                <div class="mb-3">
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-select">
+
+                        <option value="Draft">
+                            Draft
+                        </option>
+
+                        <option value="Published">
+                            Published
+                        </option>
 
                     </select>
                 </div>

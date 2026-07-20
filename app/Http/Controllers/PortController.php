@@ -170,4 +170,16 @@ class PortController extends Controller
             'status' => $port->status->status,
         ]);
     }
+
+    /**
+     * Hapus Port
+     */
+    public function destroy(Port $port)
+    {
+        $port->delete();
+
+        return redirect()
+            ->route('ports.index')
+            ->with('success', 'Port deleted successfully.');
+    }
 }

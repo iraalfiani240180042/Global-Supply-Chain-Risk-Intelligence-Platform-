@@ -32,11 +32,11 @@
 
                 <div>
 
-                    <strong>
-
-                        {{ auth()->user()->name }}
-
-                    </strong>
+                  @auth
+<strong>
+    {{ auth()->user()->name }}
+</strong>
+@endauth
 
                     <br>
 

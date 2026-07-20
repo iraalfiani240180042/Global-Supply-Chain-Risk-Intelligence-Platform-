@@ -17,15 +17,17 @@
             </p>
         </div>
         <div>
-            <a href="{{ route('ports.sync') }}" class="btn btn-success rounded-pill px-4 me-2">
-                <i class="bi bi-arrow-repeat"></i>
-                Sync Ports
-            </a>
+            @if(auth()->user()->role == 'admin')
+                <a href="{{ route('ports.sync') }}" class="btn btn-success rounded-pill px-4 me-2">
+                    <i class="bi bi-arrow-repeat"></i>
+                    Sync Ports
+                </a>
 
-            <a href="{{ route('ports.create') }}" class="btn btn-primary rounded-pill px-4">
-                <i class="bi bi-plus-circle"></i>
-                Add Port
-            </a>
+                <a href="{{ route('ports.create') }}" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-plus-circle"></i>
+                    Add Port
+                </a>
+            @endif
         </div>
     </div>
 
@@ -183,10 +185,24 @@
                             </p>
                             <p>
                                 <strong>Status :</strong>
-                                <span id="portStatus" class="badge bg-secondary">
+                                <span id="portStatus" class="badge bg-secondary text-white">
                                     -
                                 </span>
                             </p>
+
+                            @if(auth()->user()->role == 'admin')
+                                <form id="deletePortForm" method="POST" style="display:none;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger mt-3"
+                                        onclick="return confirm('Delete this port?')">
+                                        <i class="bi bi-trash"></i>
+                                        Delete Port
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -259,9 +275,15 @@
                 const statusBadge = document.getElementById('portStatus');
                 statusBadge.innerHTML = data.status;
                 if(data.status.toLowerCase() === 'active') {
-                    statusBadge.className = 'badge bg-success';
+                    statusBadge.className = 'badge bg-success text-white';
                 } else {
-                    statusBadge.className = 'badge bg-danger';
+                    statusBadge.className = 'badge bg-danger text-white';
+                }
+
+                const deleteForm = document.getElementById('deletePortForm');
+                if(deleteForm){
+                    deleteForm.action = '/ports/' + data.id;
+                    deleteForm.style.display = 'block';
                 }
 
                 // 2. Tempatkan atau pindahkan marker di peta
@@ -272,7 +294,30 @@
                 }
 
                 // Tambahkan popup interaktif pada marker
-                currentMarker.bindPopup(`<b>${data.name}</b><br>${data.country}`).openPopup();
+                currentMarker.bindPopup(`
+                    <div style="min-width:180px">
+                        <h6 class="mb-2 fw-bold">
+                            <i class="bi bi-geo-alt-fill text-danger"></i>
+                            ${data.name}
+                        </h6>
+
+                        <p class="mb-1">
+                            <strong>Country :</strong><br>
+                            ${data.country}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Status :</strong>
+                            <span class="badge ${
+                                data.status.toLowerCase() === 'active'
+                                    ? 'bg-success text-white'
+                                    : 'bg-danger text-white'
+                            }">
+                                ${data.status}
+                            </span>
+                        </p>
+                    </div>
+                `);
 
                 // 3. Geser & Zoom peta secara halus ke target koordinat pelabuhan
                 map.flyTo([data.latitude, data.longitude], 9);
@@ -292,7 +337,12 @@
         
         const statusBadge = document.getElementById('portStatus');
         statusBadge.innerHTML = '-';
-        statusBadge.className = 'badge bg-secondary';
+        statusBadge.className = 'badge bg-secondary text-white';
+
+        const deleteForm = document.getElementById('deletePortForm');
+        if(deleteForm){
+            deleteForm.style.display = 'none';
+        }
 
         if (currentMarker) {
             map.removeLayer(currentMarker);

@@ -56,11 +56,11 @@
         </li>
 
         <li>
-            <a href="{{ route('analytics') }}"
-   class="{{ request()->routeIs('analytics') ? 'active' : '' }}">
-                Analytics
-            </a>
-        </li>
+<a href="{{ route('risk.index') }}">
+<i class="bi bi-graph-up"></i>
+Risk Prediction
+</a>
+</li>
 
         <li class="nav-item">
     <a href="{{ route('comparison.index') }}" class="nav-link">
@@ -68,13 +68,21 @@
         Country Comparison
     </a>
 </li>
-
 <li class="nav-item">
-    <a href="{{ route('articles.index') }}" class="nav-link">
+    <a href="{{ route('articles.index') }}"
+       class="{{ request()->routeIs('articles.*') ? 'active' : '' }}">
         <i class="bi bi-newspaper"></i>
         <span>Artikel Analisis</span>
     </a>
 </li>
+@if(auth()->user()->role == 'user')
+<li>
+    <a href="{{ route('favorites.index') }}"
+       class="{{ request()->routeIs('favorites.*') ? 'active' : '' }}">
+        Favorite Countries
+    </a>
+</li>
+@endif
         <li>
             <a href="{{ route('profile') }}"
    class="{{ request()->routeIs('profile') ? 'active' : '' }}">

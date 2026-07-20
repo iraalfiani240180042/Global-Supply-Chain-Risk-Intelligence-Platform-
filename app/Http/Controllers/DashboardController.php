@@ -2,14 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Port;
+use App\Models\Country;
 use Illuminate\Support\Facades\Http;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        try {
+        // Total User
+        $totalUsers = User::count();
 
+        // Total Active Ports
+        $activePorts = Port::with('status')->count();
+
+        // Total Countries
+        $totalCountries = Country::count();
+
+        try {
             $response = Http::timeout(30)
                 ->retry(3, 1000)
                 ->get('https://api.open-meteo.com/v1/forecast', [
@@ -21,7 +32,6 @@ class DashboardController extends Controller
             $weather = $response->json();
 
         } catch (\Exception $e) {
-
             $weather = [
                 'current' => [
                     'temperature_2m' => '-',
@@ -31,6 +41,11 @@ class DashboardController extends Controller
             ];
         }
 
-        return view('dashboard.index', compact('weather'));
+        return view('dashboard.index', compact(
+            'weather',
+            'totalUsers',
+            'activePorts',
+            'totalCountries'
+        ));
     }
 }

@@ -11,7 +11,7 @@
 
             <h2 class="fw-bold mb-4">Edit Analysis Article</h2>
 
-            <form action="{{ route('articles.update', $article->id) }}" method="POST">
+            <form action="{{ route('articles.update', $article->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -77,6 +77,37 @@
                     </select>
                 </div>
 
+                {{-- Image Component --}}
+                <div class="mb-3">
+                    <label class="form-label">Current Image</label>
+
+                    @if($article->image)
+                        <div class="mb-3">
+                            <img src="{{ asset('storage/'.$article->image) }}"
+                                 class="img-fluid rounded shadow"
+                                 style="max-height:250px;">
+                        </div>
+                    @else
+                        <p class="text-muted">
+                            No image uploaded.
+                        </p>
+                    @endif
+
+                    <label class="form-label">
+                        Change Image
+                    </label>
+
+                    <input
+                        type="file"
+                        name="image"
+                        class="form-control"
+                        accept="image/*">
+
+                    <small class="text-muted">
+                        Leave blank if you don't want to change the image.
+                    </small>
+                </div>
+
                 {{-- Summary --}}
                 <div class="mb-3">
                     <label class="form-label">Summary</label>
@@ -137,6 +168,29 @@
                         <option value="0"
                             {{ !old('recommended', $article->recommended) ? 'selected' : '' }}>
                             Not Recommended
+                        </option>
+
+                    </select>
+                </div>
+
+                {{-- Status --}}
+                <div class="mb-3">
+                    <label class="form-label">
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        class="form-select">
+
+                        <option value="Draft"
+                            {{ old('status', $article->status) == 'Draft' ? 'selected' : '' }}>
+                            Draft
+                        </option>
+
+                        <option value="Published"
+                            {{ old('status', $article->status) == 'Published' ? 'selected' : '' }}>
+                            Published
                         </option>
 
                     </select>

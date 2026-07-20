@@ -14,6 +14,35 @@
         </p>
     </div>
 
+    {{-- Sentiment Summary --}}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">
+                News Sentiment Analysis
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="sentiment-card positive">
+                        <h6>Positive</h6>
+                        <h3>{{ $sentimentPercentage['Positive'] }}%</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="sentiment-card neutral">
+                        <h6>Neutral</h6>
+                        <h3>{{ $sentimentPercentage['Neutral'] }}%</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="sentiment-card negative">
+                        <h6>Negative</h6>
+                        <h3>{{ $sentimentPercentage['Negative'] }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- 2. Bungkus Filter dalam Card --}}
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
@@ -100,9 +129,25 @@
                     <img src="{{ $article['image'] }}" class="card-img-top" style="height:220px; object-fit:cover;">
                 @endif
                 <div class="card-body d-flex flex-column">
-                    <h5 class="fw-bold">
-                        {{ $article['title'] }}
-                    </h5>
+                    @if($article['sentiment'] == 'Positive')
+
+<span class="badge bg-success mb-2">
+    🟢 Positive Sentiment
+</span>
+
+@elseif($article['sentiment'] == 'Negative')
+
+<span class="badge bg-danger mb-2">
+    🔴 Negative Sentiment
+</span>
+
+@else
+
+<span class="badge bg-secondary mb-2">
+    🟡 Neutral Sentiment
+</span>
+
+@endif
                     <p class="text-muted flex-grow-1">
                         {{ \Illuminate\Support\Str::limit($article['description'], 120) }}
                     </p>
@@ -182,6 +227,33 @@
 
     .card {
         border-radius: 15px;
+    }
+
+    /* Sentiment Analysis Styles */
+    .sentiment-card {
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+    }
+
+    .sentiment-card h3 {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .positive {
+        background: #d1e7dd;
+        color: #146c43;
+    }
+
+    .neutral {
+        background: #fff3cd;
+        color: #997404;
+    }
+
+    .negative {
+        background: #f8d7da;
+        color: #b02a37;
     }
 </style>
 

@@ -15,10 +15,10 @@
 
                     <div>
                         <small class="text-muted">Countries</small>
-                        <h1 class="fw-bold mt-2">195</h1>
+                        <h1 class="fw-bold mt-2">{{ $totalCountries }}</h1>
 
                         <small class="text-success">
-                            ▲ +2 Today
+                            countries
                         </small>
                     </div>
 
@@ -42,7 +42,7 @@
                         <h1 class="fw-bold mt-2">12</h1>
 
                         <small class="text-danger">
-                            ▲ 3 New Alerts
+                             Alerts
                         </small>
                     </div>
 
@@ -54,29 +54,30 @@
         </div>
     </div>
 
-    <!-- News -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 kpi-card">
-            <div class="card-body">
+    <!-- Users -->
+<div class="col-lg-3 col-md-6">
+    <a href="{{ route('users.index') }}" class="text-decoration-none text-dark">
+    <div class="card shadow-sm border-0 kpi-card">
+        <div class="card-body">
 
-                <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex justify-content-between align-items-start">
 
-                    <div>
-                        <small class="text-muted">News Today</small>
-                        <h1 class="fw-bold mt-2">158</h1>
+                <div>
+                    <small class="text-muted">Users</small>
+                    <h1 class="fw-bold mt-2">{{ $totalUsers }}</h1>
 
-                        <small class="text-success">
-                            Updated 5 mins ago
-                        </small>
-                    </div>
-
-                    <i class="bi bi-newspaper text-warning fs-1"></i>
-
+                    <small class="text-success">
+                        Registered Users
+                    </small>
                 </div>
 
+                <i class="bi bi-people-fill text-success fs-1"></i>
+
             </div>
+
         </div>
     </div>
+</div>
 
     <!-- Ports -->
     <div class="col-lg-3 col-md-6">
@@ -87,7 +88,7 @@
 
                     <div>
                         <small class="text-muted">Active Ports</small>
-                        <h1 class="fw-bold mt-2">83</h1>
+                        <h1 class="fw-bold mt-2">{{ $activePorts }}</h1>
 
                         <small class="text-success">
                             All Operational

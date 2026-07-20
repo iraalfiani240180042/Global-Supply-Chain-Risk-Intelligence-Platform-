@@ -18,12 +18,11 @@
         </div>
 
         <div>
-            <a href="{{ route('countries.sync') }}" class="btn btn-success">
-                <i class="bi bi-arrow-repeat"></i> Sync Countries
-            </a>
-            <a href="{{ route('countries.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Add Country
-            </a>
+            @if(auth()->user()->role == 'admin')
+                <a href="{{ route('countries.sync') }}" class="btn btn-success">
+                    <i class="bi bi-arrow-repeat"></i> Sync Countries
+                </a>
+            @endif
         </div>
     </div>
 
@@ -79,9 +78,28 @@
                 <div class="card-body text-center">
                     <img src="{{ $country->flag }}" class="img-fluid rounded border mb-3" style="height:70px">
                     <h6 class="text-muted">Country</h6>
-                    <h4 class="fw-bold">
-                        {{ $country->name }}
-                    </h4>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="fw-bold mb-0">
+                            {{ $country->name }}
+                        </h4>
+
+                        @if(auth()->user()->role == 'user')
+                            @php
+                                $favorite = auth()->user()
+                                    ->favorites()
+                                    ->where('country_id', $country->id)
+                                    ->exists();
+                            @endphp
+
+                            <form action="{{ route('favorites.toggle', $country->id) }}" method="POST">
+                                @csrf
+                                <button class="btn btn-sm {{ $favorite ? 'btn-danger' : 'btn-outline-danger' }}">
+                                    <i class="bi bi-heart{{ $favorite ? '-fill' : '' }}"></i>
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
