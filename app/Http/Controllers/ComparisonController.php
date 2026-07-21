@@ -38,90 +38,14 @@ class ComparisonController extends Controller
             }
         }
 
-        // --- AMBIL DATA DARI WORLD BANK API ---
+        // --- AMBIL DATA DARI WORLD BANK API & GNEWS ---
 
-        // GDP Country A
-        $gdpA = null;
-        $responseGdpA = Http::get(
-            "https://api.worldbank.org/v2/country/{$country1->iso_code}/indicator/NY.GDP.MKTP.CD",
-            [
-                'format' => 'json',
-                'per_page' => 1,
-            ]
-        );
-        if ($responseGdpA->successful()) {
-            $data = $responseGdpA->json();
-            $gdpA = $data[1][0]['value'] ?? null;
-        }
+        // GDP & Inflation Country A
+        $gdpA = $this->getGdp($country1->iso_code);
+        $inflationA = $this->getInflation($country1->iso_code);
+        $newsValueA = $this->getNewsValue($country1->name);
 
-        // Inflation Country A
-        $inflationA = null;
-        $responseInflationA = Http::get(
-            "https://api.worldbank.org/v2/country/{$country1->iso_code}/indicator/FP.CPI.TOTL.ZG",
-            [
-                'format' => 'json',
-                'per_page' => 1,
-            ]
-        );
-        if ($responseInflationA->successful()) {
-            $data = $responseInflationA->json();
-            $inflationA = $data[1][0]['value'] ?? null;
-        }
-
-        // News Sentiment Country A
-        $positiveNewsA = 0;
-        $negativeNewsA = 0;
-
-        $responseNewsA = Http::get('https://gnews.io/api/v4/search',[
-            'q'=>$country1->name,
-            'lang'=>'en',
-            'max'=>5,
-            'apikey'=>env('GNEWS_API_KEY')
-        ]);
-
-        if($responseNewsA->successful()){
-            $articlesA = $responseNewsA->json()['articles'] ?? [];
-
-            foreach($articlesA as $article){
-                $text = strtolower(
-                    ($article['title'] ?? '') . ' ' .
-                    ($article['description'] ?? '')
-                );
-
-                if(
-                    str_contains($text,'growth') ||
-                    str_contains($text,'increase') ||
-                    str_contains($text,'success') ||
-                    str_contains($text,'investment')
-                ){
-                    $positiveNewsA++;
-                }
-
-                if(
-                    str_contains($text,'war') ||
-                    str_contains($text,'crisis') ||
-                    str_contains($text,'inflation') ||
-                    str_contains($text,'disaster') ||
-                    str_contains($text,'conflict')
-                ){
-                    $negativeNewsA++;
-                }
-            }
-        }
-
-        $negativeCountA = $negativeNewsA;
-
-        if ($negativeCountA == 0) {
-            $newsValueA = 100;
-        } elseif ($negativeCountA <= 2) {
-            $newsValueA = 70;
-        } elseif ($negativeCountA <= 4) {
-            $newsValueA = 40;
-        } else {
-            $newsValueA = 20;
-        }
-
-        // Hitung Risiko Country A (Tanpa parameter $gdpA)
+        // Hitung Risiko Country A
         $riskA = $this->calculateRisk(
             $inflationA,
             $weatherA,
@@ -129,92 +53,12 @@ class ComparisonController extends Controller
             $newsValueA
         );
 
-        $riskScoreA = $riskA['risk_score'];
-        $riskLevelA = $riskA['risk_level'];
+        // GDP & Inflation Country B
+        $gdpB = $this->getGdp($country2->iso_code);
+        $inflationB = $this->getInflation($country2->iso_code);
+        $newsValueB = $this->getNewsValue($country2->name);
 
-
-        // GDP Country B
-        $gdpB = null;
-        $responseGdpB = Http::get(
-            "https://api.worldbank.org/v2/country/{$country2->iso_code}/indicator/NY.GDP.MKTP.CD",
-            [
-                'format' => 'json',
-                'per_page' => 1,
-            ]
-        );
-        if ($responseGdpB->successful()) {
-            $data = $responseGdpB->json();
-            $gdpB = $data[1][0]['value'] ?? null;
-        }
-
-        // Inflation Country B
-        $inflationB = null;
-        $responseInflationB = Http::get(
-            "https://api.worldbank.org/v2/country/{$country2->iso_code}/indicator/FP.CPI.TOTL.ZG",
-            [
-                'format' => 'json',
-                'per_page' => 1,
-            ]
-        );
-        if ($responseInflationB->successful()) {
-            $data = $responseInflationB->json();
-            $inflationB = $data[1][0]['value'] ?? null;
-        }
-
-        // News Sentiment Country B
-        $positiveNewsB = 0;
-        $negativeNewsB = 0;
-
-        $responseNewsB = Http::get('https://gnews.io/api/v4/search',[
-            'q'=>$country2->name,
-            'lang'=>'en',
-            'max'=>5,
-            'apikey'=>env('GNEWS_API_KEY')
-        ]);
-
-        if($responseNewsB->successful()){
-            $articlesB = $responseNewsB->json()['articles'] ?? [];
-
-            foreach($articlesB as $article){
-                $text = strtolower(
-                    ($article['title'] ?? '') . ' ' .
-                    ($article['description'] ?? '')
-                );
-
-                if(
-                    str_contains($text,'growth') ||
-                    str_contains($text,'increase') ||
-                    str_contains($text,'success') ||
-                    str_contains($text,'investment')
-                ){
-                    $positiveNewsB++;
-                }
-
-                if(
-                    str_contains($text,'war') ||
-                    str_contains($text,'crisis') ||
-                    str_contains($text,'inflation') ||
-                    str_contains($text,'disaster') ||
-                    str_contains($text,'conflict')
-                ){
-                    $negativeNewsB++;
-                }
-            }
-        }
-
-        $negativeCountB = $negativeNewsB;
-
-        if ($negativeCountB == 0) {
-            $newsValueB = 100;
-        } elseif ($negativeCountB <= 2) {
-            $newsValueB = 70;
-        } elseif ($negativeCountB <= 4) {
-            $newsValueB = 40;
-        } else {
-            $newsValueB = 20;
-        }
-
-        // Hitung Risiko Country B (Tanpa parameter $gdpB)
+        // Hitung Risiko Country B
         $riskB = $this->calculateRisk(
             $inflationB,
             $weatherB,
@@ -222,39 +66,35 @@ class ComparisonController extends Controller
             $newsValueB
         );
 
-        $riskScoreB = $riskB['risk_score'];
-        $riskLevelB = $riskB['risk_level'];
-
-
         // --- PENGIRIMAN JSON RESPONSE ---
 
         return response()->json([
             'countryA' => [
-                'id' => $country1->id,
-                'name' => $country1->name,
-                'flag' => $country1->flag,
-                'region' => $country1->region->name ?? '-',
-                'population' => $country1->population,
-                'currency' => $country1->currency_code,
-                'exchange_rate' => $exchangeRates[$country1->currency_code] ?? '-',
-                'gdp' => $gdpA,
+                'id'             => $country1->id,
+                'name'           => $country1->name,
+                'flag'           => $country1->flag,
+                'region'         => $country1->region->name ?? '-',
+                'population'     => $country1->population,
+                'currency'       => $country1->currency_code,
+                'exchange_rate'  => $exchangeRates[$country1->currency_code] ?? '-',
+                'gdp'            => $gdpA,
                 'inflation_rate' => $inflationA,
-                'risk_score' => $riskScoreA,
-                'risk_level' => $riskLevelA,
+                'risk_score'     => $riskA['risk_score'],
+                'risk_level'     => $riskA['risk_level'],
             ],
 
             'countryB' => [
-                'id' => $country2->id,
-                'name' => $country2->name,
-                'flag' => $country2->flag,
-                'region' => $country2->region->name ?? '-',
-                'population' => $country2->population,
-                'currency' => $country2->currency_code,
-                'exchange_rate' => $exchangeRates[$country2->currency_code] ?? '-',
-                'gdp' => $gdpB,
+                'id'             => $country2->id,
+                'name'           => $country2->name,
+                'flag'           => $country2->flag,
+                'region'         => $country2->region->name ?? '-',
+                'population'     => $country2->population,
+                'currency'       => $country2->currency_code,
+                'exchange_rate'  => $exchangeRates[$country2->currency_code] ?? '-',
+                'gdp'            => $gdpB,
                 'inflation_rate' => $inflationB,
-                'risk_score' => $riskScoreB,
-                'risk_level' => $riskLevelB,
+                'risk_score'     => $riskB['risk_score'],
+                'risk_level'     => $riskB['risk_level'],
             ],
 
             'weatherA' => $weatherA,
@@ -262,6 +102,104 @@ class ComparisonController extends Controller
         ]);
     }
 
+    /**
+     * Helper Method: Ambil Data GDP dari World Bank
+     */
+    private function getGdp($isoCode)
+    {
+        $response = Http::get(
+            "https://api.worldbank.org/v2/country/{$isoCode}/indicator/NY.GDP.MKTP.CD",
+            [
+                'format'   => 'json',
+                'per_page' => 1,
+            ]
+        );
+
+        if ($response->successful()) {
+            $data = $response->json();
+            return $data[1][0]['value'] ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Helper Method: Ambil Data Inflasi dari World Bank
+     */
+    private function getInflation($isoCode)
+    {
+        $response = Http::get(
+            "https://api.worldbank.org/v2/country/{$isoCode}/indicator/FP.CPI.TOTL.ZG",
+            [
+                'format'   => 'json',
+                'per_page' => 1,
+            ]
+        );
+
+        if ($response->successful()) {
+            $data = $response->json();
+            return isset($data[1][0]['value']) ? round($data[1][0]['value'], 2) : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Helper Method: Analisis News Value (Sesuai penyesuaian baru)
+     */
+    private function getNewsValue($countryName)
+    {
+        $negativeWords = [
+            'war',
+            'conflict',
+            'crisis',
+            'strike',
+            'earthquake',
+            'tsunami',
+            'flood',
+            'inflation',
+            'protest',
+            'sanction'
+        ];
+
+        $negativeCount = 0;
+
+        $response = Http::get('https://gnews.io/api/v4/search', [
+            'q'      => $countryName . ' trade OR export OR logistics',
+            'lang'   => 'en',
+            'max'    => 5,
+            'apikey' => env('GNEWS_API_KEY'),
+        ]);
+
+        if ($response->successful()) {
+            $news = $response->json()['articles'] ?? [];
+
+            foreach ($news as $item) {
+                $title = strtolower($item['title'] ?? '');
+
+                foreach ($negativeWords as $word) {
+                    if (str_contains($title, $word)) {
+                        $negativeCount++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($negativeCount == 0) {
+            return 85;
+        } elseif ($negativeCount <= 2) {
+            return 70;
+        } elseif ($negativeCount <= 4) {
+            return 50;
+        } else {
+            return 30;
+        }
+    }
+
+    /**
+     * Helper Method: Ambil Data Cuaca
+     */
     private function getWeather($country)
     {
         if (!$country->latitude || !$country->longitude) {
@@ -271,10 +209,10 @@ class ComparisonController extends Controller
         $response = Http::get(
             'https://api.open-meteo.com/v1/forecast',
             [
-                'latitude' => $country->latitude,
+                'latitude'  => $country->latitude,
                 'longitude' => $country->longitude,
-                'current' => 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',
-                'timezone' => 'auto'
+                'current'   => 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',
+                'timezone'  => 'auto'
             ]
         );
 
@@ -285,32 +223,31 @@ class ComparisonController extends Controller
         $current = $response->json()['current'];
 
         $current['description'] = match ($current['weather_code']) {
-            0 => 'Clear Sky',
-            1, 2, 3 => 'Partly Cloudy',
-            45, 48 => 'Fog',
-            51, 53, 55 => 'Drizzle',
-            61, 63, 65 => 'Rain',
-            71, 73, 75 => 'Snow',
-            80, 81, 82 => 'Rain Showers',
-            95 => 'Thunderstorm',
-            default => 'Unknown',
+            0          => '☀️ Clear Sky',
+            1, 2, 3    => '⛅ Partly Cloudy',
+            45, 48     => '🌫 Fog',
+            51, 53, 55 => '🌦 Drizzle',
+            61, 63, 65 => '🌧 Rain',
+            71, 73, 75 => '❄ Snow',
+            80, 81, 82 => '🌧 Rain Showers',
+            95         => '⛈ Thunderstorm',
+            default    => 'Unknown',
         };
 
         return $current;
     }
 
+    /**
+     * Helper Method: Kalkulasi Skor Risiko (Penyesuaian Baseline 90 & Tier News)
+     */
     private function calculateRisk($inflation, $weather, $exchangeRate, $newsValue)
     {
-        $weightWeather   = 0.25;
-        $weightInflation = 0.25;
-        $weightExchange  = 0.20;
-        $weightNews      = 0.30;
-
-        // Weather
-        $weatherValue = 100;
+        // ====================================
+        // WEATHER SCORE
+        // ====================================
+        $weatherValue = 90;
 
         if ($weather) {
-
             if ($weather['wind_speed_10m'] > 30) {
                 $weatherValue = 30;
             } elseif ($weather['wind_speed_10m'] > 20) {
@@ -326,11 +263,12 @@ class ComparisonController extends Controller
             $weatherValue = max(0, min(100, $weatherValue));
         }
 
-        // Inflation
-        $inflationValue = 100;
+        // ====================================
+        // INFLATION SCORE
+        // ====================================
+        $inflationValue = 90;
 
         if ($inflation !== null) {
-
             if ($inflation >= 10) {
                 $inflationValue = 20;
             } elseif ($inflation >= 6) {
@@ -338,21 +276,34 @@ class ComparisonController extends Controller
             } elseif ($inflation >= 3) {
                 $inflationValue = 80;
             }
-
         }
 
-        // Exchange Rate
-        $exchangeValue = $exchangeRate ? 100 : 40;
+        // ====================================
+        // EXCHANGE SCORE
+        // ====================================
+        $exchangeValue = $exchangeRate ? 90 : 40;
 
-        // Final Score
-        $safeScore =
-            ($weatherValue * $weightWeather) +
-            ($inflationValue * $weightInflation) +
-            ($exchangeValue * $weightExchange) +
-            ($newsValue * $weightNews);
+        // ====================================
+        // CONVERT SAFE SCORE TO RISK SCORE
+        // ====================================
+        $weatherRisk   = 100 - $weatherValue;
+        $inflationRisk = 100 - $inflationValue;
+        $exchangeRisk  = 100 - $exchangeValue;
+        $newsRisk      = 100 - $newsValue;
 
-        $riskScore = round(100 - $safeScore);
+        // ====================================
+        // FINAL RISK SCORE (Weather 30%, Inflation 20%, Exchange 10%, News 40%)
+        // ====================================
+        $riskScore = round(
+            ($weatherRisk * 0.30) +
+            ($inflationRisk * 0.20) +
+            ($exchangeRisk * 0.10) +
+            ($newsRisk * 0.40)
+        );
 
+        // ====================================
+        // LEVEL
+        // ====================================
         if ($riskScore <= 30) {
             $riskLevel = "Low Risk";
         } elseif ($riskScore <= 60) {

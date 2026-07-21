@@ -171,19 +171,9 @@ class CountryController extends Controller
         }
 
         // ====================================
-        // RISK SCORE CALCULATION
-        // ====================================
-
-        // Weight
-        $weightWeather   = 0.25;
-        $weightInflation = 0.25;
-        $weightExchange  = 0.20;
-        $weightNews      = 0.30;
-
-        // ====================================
         // WEATHER SCORE (0-100)
         // ====================================
-        $weatherValue = 100;
+        $weatherValue = 90;
 
         if ($weather) {
 
@@ -205,7 +195,7 @@ class CountryController extends Controller
         // ====================================
         // INFLATION SCORE
         // ====================================
-        $inflationValue = 100;
+        $inflationValue = 90;
 
         if ($inflation !== null) {
 
@@ -222,7 +212,7 @@ class CountryController extends Controller
         // ====================================
         // EXCHANGE SCORE
         // ====================================
-        $exchangeValue = $exchangeRate ? 100 : 40;
+        $exchangeValue = $exchangeRate ? 90 : 40;
 
         // ====================================
         // NEWS SCORE
@@ -257,27 +247,34 @@ class CountryController extends Controller
 
         }
 
-        if ($negativeCount == 0) {
-            $newsValue = 100;
-        } elseif ($negativeCount <= 2) {
-            $newsValue = 70;
-        } elseif ($negativeCount <= 4) {
-            $newsValue = 40;
-        } else {
-            $newsValue = 20;
-        }
+       if ($negativeCount == 0) {
+    $newsValue = 85;
+} elseif ($negativeCount <= 2) {
+    $newsValue = 70;
+} elseif ($negativeCount <= 4) {
+    $newsValue = 50;
+} else {
+    $newsValue = 30;
+}
+        // ====================================
+        // CONVERT SAFE SCORE TO RISK SCORE
+        // ====================================
+
+        $weatherRisk   = 100 - $weatherValue;
+        $inflationRisk = 100 - $inflationValue;
+        $exchangeRisk  = 100 - $exchangeValue;
+        $newsRisk      = 100 - $newsValue;
 
         // ====================================
         // FINAL RISK SCORE
         // ====================================
 
-        $safeScore =
-            ($weatherValue * $weightWeather) +
-            ($inflationValue * $weightInflation) +
-            ($exchangeValue * $weightExchange) +
-            ($newsValue * $weightNews);
-
-        $riskScore = round(100 - $safeScore);
+        $riskScore = round(
+            ($weatherRisk * 0.30) +
+            ($inflationRisk * 0.20) +
+            ($exchangeRisk * 0.10) +
+            ($newsRisk * 0.40)
+        );
 
         // ====================================
         // LEVEL
@@ -305,10 +302,10 @@ class CountryController extends Controller
         // ====================================
 
         $riskBreakdown = [
-            'Weather'        => round((100 - $weatherValue) * $weightWeather),
-            'Inflation'      => round((100 - $inflationValue) * $weightInflation),
-            'Exchange Rate'  => round((100 - $exchangeValue) * $weightExchange),
-            'News Sentiment' => round((100 - $newsValue) * $weightNews),
+            'Weather'       => round($weatherRisk * 0.30),
+            'Inflation'     => round($inflationRisk * 0.20),
+            'Exchange Rate' => round($exchangeRisk * 0.10),
+            'News'          => round($newsRisk * 0.40),
         ];
 
         // =====================
@@ -332,19 +329,23 @@ class CountryController extends Controller
 
         foreach ($inflationTrend as $item) {
 
-            $score = 100;
+            $inflationRiskVal = 0;
 
             if ($item['value'] >= 10) {
-                $score = 20;
+                $inflationRiskVal = 60;
             } elseif ($item['value'] >= 6) {
-                $score = 50;
+                $inflationRiskVal = 50;
             } elseif ($item['value'] >= 3) {
-                $score = 80;
+                $inflationRiskVal = 40;
+            } elseif ($item['value'] >= 1) {
+                $inflationRiskVal = 30;
+            } else {
+                $inflationRiskVal = 20;
             }
 
             $riskTrend[] = [
-                'year' => $item['year'],
-                'score' => 100 - $score
+                'year'  => $item['year'],
+                'score' => $inflationRiskVal
             ];
         }
 

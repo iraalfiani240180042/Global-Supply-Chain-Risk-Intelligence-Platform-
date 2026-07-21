@@ -272,23 +272,7 @@
         </div>
     </div>
 
-    {{-- News Sentiment Card --}}
-    <div class="row mt-3">
-        <div class="col-lg-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5>News Sentiment</h5>
-                    <h3 class="fw-bold">
-                        {{ $newsSentiment ?? 'Neutral' }}
-                    </h3>
-                    <p class="text-muted mb-0">
-                        Positive News : {{ $positiveNews ?? 0 }} | Negative News : {{ $negativeNews ?? 0 }}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
+  
     {{-- GDP Chart --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body">
@@ -417,11 +401,7 @@
                     1 USD = {{ $exchangeRate ? number_format($exchangeRate,2) : '-' }} {{ $country->currency_code }}
                 </li>
 
-                <li class="mb-2">
-                    <strong>News Sentiment:</strong>
-                    {{ $newsSentiment ?? 'Neutral' }}
-                </li>
-
+             
                 <li><strong>Risk Recommendation:</strong> Monitor the latest local updates in the news stream above to watch out for real-time customs adjustments or distribution bottlenecks.</li>
             </ul>
         </div>
@@ -544,26 +524,43 @@
             // Risk Trend
             // ==========================
             @if(!empty($riskTrend))
-                new Chart(document.getElementById('riskChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: @json(array_column($riskTrend, 'year')),
-                        datasets: [{
-                            label: 'Risk Score',
-                            data: @json(array_column($riskTrend, 'score')),
-                            backgroundColor: '#ffc107',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, max: 100, title: { display: true, text: 'Risk Score (0-100)' } },
-                            x: { title: { display: true, text: 'Year' } }
-                        }
-                    }
-                });
+               new Chart(document.getElementById('riskChart'), {
+    type: 'line',
+    data: {
+        labels: @json(array_column($riskTrend,'year')),
+        datasets: [{
+            label: 'Risk Score',
+            data: @json(array_column($riskTrend,'score')),
+            borderColor: '#36A2EB',
+            backgroundColor: 'rgba(54,162,235,.15)',
+            borderWidth: 4,
+            fill: false,
+            tension: .3,
+            pointRadius: 5,
+            pointHoverRadius: 7
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                title: {
+                    display: true,
+                    text: 'Risk Score'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Year'
+                }
+            }
+        }
+    }
+});
             @endif
 
         });

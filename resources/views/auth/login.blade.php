@@ -1,73 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Global Supply Chain</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, Helvetica, sans-serif;
-        }
+<title>Login - Global Supply Chain</title>
 
-        body{
-            background:#0f172a;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-        }
+<style>
 
-        .card{
-            width:380px;
-            background:white;
-            padding:35px;
-            border-radius:15px;
-            box-shadow:0 10px 30px rgba(0,0,0,.3);
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
 
-        h2{
-            text-align:center;
-            margin-bottom:25px;
-        }
+body{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
 
-        input{
-            width:100%;
-            padding:12px;
-            margin-bottom:15px;
-            border-radius:8px;
-            border:1px solid #ddd;
-        }
+.card{
+    width:430px;
+    background:#fff;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 20px 45px rgba(0,0,0,.25);
+}
 
-        button{
-            width:100%;
-            padding:12px;
-            border:none;
-            background:#2563eb;
-            color:white;
-            border-radius:8px;
-            cursor:pointer;
-        }
+.logo{
+    width:70px;
+    height:70px;
+    margin:auto;
+    margin-bottom:20px;
+    background:#2563eb;
+    color:white;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+}
 
-        button:hover{
-            background:#1d4ed8;
-        }
+h2{
+    text-align:center;
+    margin-bottom:8px;
+}
 
-        .error{
-            color:red;
-            margin-bottom:15px;
-        }
+.subtitle{
+    text-align:center;
+    color:#64748b;
+    margin-bottom:30px;
+    font-size:14px;
+}
 
-    </style>
+input{
+    width:100%;
+    padding:14px;
+    margin-bottom:18px;
+    border:1px solid #dbeafe;
+    border-radius:10px;
+    background:#f8fafc;
+    transition:.3s;
+    font-size:15px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#2563eb;
+    background:white;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.error{
+    color:#dc2626;
+    background:#fee2e2;
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.register{
+    margin-top:25px;
+    text-align:center;
+    color:#64748b;
+}
+
+.register a{
+    color:#2563eb;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.register a:hover{
+    text-decoration:underline;
+}
+
+</style>
+
 </head>
+
 <body>
 
 <div class="card">
 
+    <div class="logo">
+        🌍
+    </div>
+
     <h2>Global Supply Chain</h2>
+
+    <p class="subtitle">
+        Risk Intelligence Platform
+    </p>
 
     @if ($errors->any())
         <div class="error">
@@ -82,7 +146,7 @@
         <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder="Email Address"
             required>
 
         <input
@@ -97,15 +161,14 @@
 
     </form>
 
-</div>
-<div class="text-center mt-3">
-
-    Don't have an account?
-
-    <a href="{{ route('register') }}">
-        Register
-    </a>
+    <div class="register">
+        Don't have an account?
+        <a href="{{ route('register') }}">
+            Register
+        </a>
+    </div>
 
 </div>
+
 </body>
 </html>

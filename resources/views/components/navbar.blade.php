@@ -30,23 +30,18 @@
 
                 <i class="bi bi-person-circle fs-3"></i>
 
-                <div>
+              <div>
+    @auth
+        <strong>{{ auth()->user()->name }}</strong>
+        <br>
 
-                  @auth
-<strong>
-    {{ auth()->user()->name }}
-</strong>
-@endauth
-
-                    <br>
-
-                    <small class="text-secondary">
-
-                        Administrator
-
-                    </small>
-
-                </div>
+        @if(auth()->user()->role == 'admin')
+            <small class="text-secondary">Administrator</small>
+        @else
+            <small class="text-secondary">Exporter</small>
+        @endif
+    @endauth
+</div>
 
             </div>
 
